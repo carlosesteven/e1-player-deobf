@@ -27,9 +27,16 @@ const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
 
 // Construye la key
 const key = aValues.map(n => rValues[n]).join('');
-
 console.log("Key:", key);
 console.log("Length:", key.length);
+
+// Valida la key (por ejemplo, que sea de 64 caracteres hexadecimales)
+const isValidKey = key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
+
+if (!isValidKey) {
+    console.error("La key generada NO es válida. No se guardará el archivo.");
+    process.exit(1);
+}
 
 // Crea el JSON de salida
 const result = {
@@ -38,5 +45,4 @@ const result = {
 };
 
 fs.writeFileSync('key.json', JSON.stringify(result, null, 2), 'utf-8');
-
-console.log('Archivo megacloud-key.json creado.');
+console.log('Archivo key.json creado correctamente.');
