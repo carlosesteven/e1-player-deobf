@@ -21,7 +21,8 @@ export async function sendErrorEmail(mensajeExtra = '') {
         auth: {
             user: correo_remitente,
             pass: password_remitente
-        }
+        },
+        headers: { 'Content-Type': 'text/plain; charset=UTF-8' }
     });
 
     const mailOptions = {
