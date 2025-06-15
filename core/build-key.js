@@ -3,7 +3,8 @@ import path from 'path';
 import { sendErrorEmail } from './send-email.js';
 
 async function main() {
-    const outputDir = '../output';
+    const repoRoot = path.resolve(__dirname, '..'); // si tu archivo está en core/
+    const outputDir = path.join(repoRoot, 'output');
 
     // Read the deobfuscated JS file from output/output.js
     const code = fs.readFileSync(path.join(outputDir, 'output.js'), 'utf-8');
