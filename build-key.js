@@ -17,10 +17,23 @@ if (keyMatch) {
     const arrayMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[((?:"[0-9a-fA-F]{2}",?\s*){64})\]/);
 
     if (arrayMatch) {
-        // Get all hex strings from the array and concatenate them
         const hexStrings = arrayMatch[0].match(/"([0-9a-fA-F]{2})"/g).map(s => s.replace(/"/g, ''));
-        key = hexStrings.join('');
-        console.log("Key built from array of hex strings:", key);
+        // Opción 1: key como texto ASCII
+        const asciiKey = hexStrings.map(h => String.fromCharCode(parseInt(h, 16))).join('');
+        // Opción 2: key como hex puro
+        const hexKey = hexStrings.join('');
+    
+        // ¿Cuál usar? Priorizamos ASCII si es printable y longitud 64, si no el hex
+        if (/^[\x20-\x7E]{64}$/.test(asciiKey)) { // 64 caracteres ASCII imprimibles
+            key = asciiKey;
+            console.log("Key built from array of hex strings (as ASCII):", key);
+        } else if (hexKey.length === 128 && /^[0-9a-fA-F]+$/.test(hexKey)) {
+            key = hexKey;
+            console.log("Key built from array of hex strings (as HEX):", key);
+        } else {
+            console.error("Array of hex strings found, but neither ASCII nor HEX version is valid.");
+            process.exit(1);
+        }
     } else {
         // Otherwise, search for the arrays as before (legacy logic)
         const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
