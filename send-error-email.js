@@ -1,4 +1,5 @@
 import 'dotenv/config';
+
 import nodemailer from 'nodemailer';
 
 const correo_remitente = process.env.MAIL_USER;
