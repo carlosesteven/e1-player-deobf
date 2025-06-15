@@ -8,7 +8,7 @@ git pull
 # Install updated dependencies
 npm install
 
-# Run the Node.js sequence (nota: están en core/)
+# Run the Node.js sequence
 node core/download-input.js
 node core/deobfuscate.js
 node core/build-key.js
