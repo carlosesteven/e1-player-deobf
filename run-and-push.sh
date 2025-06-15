@@ -14,9 +14,7 @@ node core/build-key.js
 git add .
 
 # Commit with current date and time
-git commit -m "Automated update: $(date '+%Y-%m-%d %H:%M:%S')"
+git commit -m "Update: $(date '+%Y-%m-%d %H:%M:%S')"
 
 # Push the changes
 git push
-
-echo "All done: Sequence executed and changes pushed to GitHub."
