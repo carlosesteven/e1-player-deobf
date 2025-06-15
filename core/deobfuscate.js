@@ -9,8 +9,12 @@ import { solveStateMachine } from '../transformers/solveStateMachine.js';
 import { inlineStringArray } from '../transformers/inlineStringArray.js';
 
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const repoRoot = path.resolve(__dirname, '..'); // si el archivo está en core/
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const repoRoot = path.resolve(__dirname, '..'); 
 const outputDir = path.join(repoRoot, 'output');
 const inputFile = path.join(outputDir, 'input.txt');
 const outputFile = path.join(outputDir, 'output.js');

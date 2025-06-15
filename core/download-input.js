@@ -1,13 +1,15 @@
 import https from 'https';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 const timestamp = Date.now();
-
 const url = `https://megacloud.blog/js/player/a/v2/pro/embed-1.min.js?v=${timestamp}`;
 
-const repoRoot = path.resolve(__dirname, '..'); // Si este archivo está en /core
-const outputDir = path.join(repoRoot, 'output');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const outputDir = path.join(__dirname, '..', 'output');
 const outputFile = path.join(outputDir, 'input.txt');
 
 // Ensure the output directory exists

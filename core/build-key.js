@@ -1,9 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import { sendErrorEmail } from './send-email.js';
+import { fileURLToPath } from 'url';
 
 async function main() {
-    const repoRoot = path.resolve(__dirname, '..'); // si tu archivo está en core/
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    const repoRoot = path.resolve(__dirname, '..'); 
+
     const outputDir = path.join(repoRoot, 'output');
 
     // Read the deobfuscated JS file from output/output.js
