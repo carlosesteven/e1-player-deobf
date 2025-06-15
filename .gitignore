@@ -1,6 +1,8 @@
 input.txt
 output.js
 
+output/*
+
 # Logs
 logs
 *.log

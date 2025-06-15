@@ -8,10 +8,16 @@ import { solveStringArray } from './transformers/solveStringArray.js';
 import { solveStateMachine } from './transformers/solveStateMachine.js';
 import { inlineStringArray } from './transformers/inlineStringArray.js';
 
+import path from 'path';
+
+const inputDir = 'output';
+const inputFile = path.join(inputDir, 'input.txt');
+const outputFile = path.join(inputDir, 'output.js');
+
 try {
     let intermediateCode;
     // normalize literals and unflatten cf
-    const inputCode = fs.readFileSync('input.txt', 'utf-8');
+    const inputCode = fs.readFileSync(inputFile, 'utf-8');
     console.log("--- Starting Pass 1: Normalizing Literals and Unflattening Control Flow ---");
     const unflattenedResult = babel.transformSync(inputCode, {
         sourceType: "script",
@@ -23,7 +29,7 @@ try {
         throw new Error("Pass 1 (Normalizing and unflattening) failed to produce code.");
     }
     intermediateCode = unflattenedResult.code;
-    fs.writeFileSync('output.js', intermediateCode, 'utf-8');
+    fs.writeFileSync(outputFile, intermediateCode, 'utf-8');
     console.log("Pass 1 complete.");
 
     // inline data
@@ -38,7 +44,7 @@ try {
         throw new Error("Pass 2 (Inlining Arbitrary Data) failed to produce code.");
     }
     intermediateCode = inlinedDataResult.code;
-    fs.writeFileSync('output.js', intermediateCode, 'utf-8');
+    fs.writeFileSync(outputFile, intermediateCode, 'utf-8');
     console.log("Pass 2 complete.")
 
     // solve string array and state machine
@@ -53,7 +59,7 @@ try {
         throw new Error("Pass 3 (Solving String Array & State Machine) failed to produce code.");
     }
     intermediateCode = transformStringArray.code;
-    fs.writeFileSync('output.js', intermediateCode, 'utf-8');
+    fs.writeFileSync(outputFile, intermediateCode, 'utf-8');
     console.log("Pass 3 complete.")
 
 
@@ -69,7 +75,7 @@ try {
         throw new Error("Pass 4 (Inlining String Array) failed to produce code.");
     }
     intermediateCode = inlineStringArr.code;
-    fs.writeFileSync('output.js', intermediateCode, 'utf-8');
+    fs.writeFileSync(outputFile, intermediateCode, 'utf-8');
     console.log("Pass 4 complete.")
 } catch (err) {
     console.error("\nAn error occurred during deobfuscation:", err);

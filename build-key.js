@@ -1,19 +1,20 @@
 import fs from 'fs';
+import path from 'path';
 
-// Lee el archivo de JS desofuscado
-const code = fs.readFileSync('output.js', 'utf-8');
+// Read the deobfuscated JS file from output/output.js
+const code = fs.readFileSync(path.join('output', 'output.js'), 'utf-8');
 
-// Busca si hay una key tipo D = "--abc123..."; (hex string con prefijo "--")
+// Look for a key like D = "--abc123..."; (hex string with "--" prefix)
 const keyMatch = code.match(/D\s*=\s*["'`](--)?([0-9a-fA-F]{64})["'`]/);
 
 let key = null;
 
 if (keyMatch) {
-    // Si encuentra, extrae la key quitando el prefijo "--" si lo tiene
+    // If found, extract the key, removing the "--" prefix if present
     key = keyMatch[2];
-    console.log("Key encontrada directamente:", key);
+    console.log("Key found directly:", key);
 } else {
-    // Si no, busca los arrays como antes (lógica previa)
+    // Otherwise, search for the arrays as before (legacy logic)
     const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
     let rArray = null, aArray = null;
 
@@ -26,7 +27,7 @@ if (keyMatch) {
     }
 
     if (!rArray || !aArray) {
-        console.error("No se encontraron los arrays ni la variable directa.");
+        console.error("Could not find the arrays or direct variable.");
         process.exit(1);
     }
 
@@ -34,18 +35,18 @@ if (keyMatch) {
     const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
 
     key = aValues.map(n => rValues[n]).join('');
-    console.log("Key reconstruida:", key);
+    console.log("Key reconstructed:", key);
 }
 
-// Valida la key
+// Validate the key
 const isValidKey = key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
 
 if (!isValidKey) {
-    console.error("La key generada NO es válida. No se guardará el archivo.");
+    console.error("The generated key is NOT valid. The file will not be saved.");
     process.exit(1);
 }
 
-// Intenta leer el archivo existente para comparar
+// Try reading the existing file to compare
 let lastKey = null;
 let lastModifiedAt = null;
 let elapsedSeconds = null;
@@ -64,13 +65,13 @@ try {
     previousModifiedAt = null;
 }
 
-// Si la key NO cambió, salir sin guardar
+// If the key did NOT change, exit without saving
 if (lastKey === key) {
-    console.log('La key no cambió, no se actualizará el archivo.');
+    console.log('The key has not changed, the file will not be updated.');
     process.exit(0);
 }
 
-// Calcula tiempo transcurrido en segundos
+// Calculate elapsed time in seconds
 if (lastModifiedAt) {
     try {
         const lastDate = new Date(lastModifiedAt).getTime();
@@ -83,7 +84,7 @@ if (lastModifiedAt) {
     }
 }
 
-// Crea el JSON de salida
+// Create the output JSON
 const result = {
     megacloud: key,
     modifiedAt: new Date().toISOString(),
@@ -92,6 +93,9 @@ const result = {
 };
 
 fs.writeFileSync('key.json', JSON.stringify(result, null, 2), 'utf-8');
-console.log('Archivo key.json creado correctamente.');
-console.log('Fecha anterior:', previousModifiedAt);
-console.log('Tiempo desde la última generación:', elapsedSeconds, 'segundos');
+
+console.log('key.json file created successfully.');
+
+console.log('Previous date:', previousModifiedAt);
+
+console.log('Time since last generation:', elapsedSeconds, 'seconds');
