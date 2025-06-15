@@ -28,7 +28,7 @@ export async function sendErrorEmail(mensajeExtra = '') {
     const mailOptions = {
         from: `"Support CSC LAB" <${correo_remitente}>`,
         to: correo_destinatario,
-        subject: `E1 Player Deobfuscator: Failed to find key at ${hora}`,
+        subject: `Deobfuscator: Failed to find key at ${hora}`,
         text: `There was an error: The key could not be found.\n\nTime of incident: ${hora}\n\n${mensajeExtra}\n\nPlease check the extractor immediately.`,
     };
 
