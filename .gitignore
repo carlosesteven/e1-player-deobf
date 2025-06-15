@@ -1,7 +1,5 @@
-input.txt
-output.js
-
-output/*
+output/*.txt
+output/*.js
 
 # Logs
 logs

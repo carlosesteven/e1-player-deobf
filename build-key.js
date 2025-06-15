@@ -46,6 +46,9 @@ if (!isValidKey) {
     process.exit(1);
 }
 
+// Set output key file location
+const keyFile = path.join('output', 'key.json');
+
 // Try reading the existing file to compare
 let lastKey = null;
 let lastModifiedAt = null;
@@ -53,8 +56,8 @@ let elapsedSeconds = null;
 let previousModifiedAt = null;
 
 try {
-    if (fs.existsSync('key.json')) {
-        const previous = JSON.parse(fs.readFileSync('key.json', 'utf-8'));
+    if (fs.existsSync(keyFile)) {
+        const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
         lastKey = previous.megacloud;
         lastModifiedAt = previous.modifiedAt;
         previousModifiedAt = previous.modifiedAt;
@@ -92,7 +95,7 @@ const result = {
     elapsedSeconds
 };
 
-fs.writeFileSync('key.json', JSON.stringify(result, null, 2), 'utf-8');
+fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
 
 console.log('key.json file created successfully.');
 
