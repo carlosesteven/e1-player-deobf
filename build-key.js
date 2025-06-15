@@ -58,7 +58,7 @@ let previousModifiedAt = null;
 try {
     if (fs.existsSync(keyFile)) {
         const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
-        lastKey = previous.megacloud;
+        lastKey = previous.decryptKey;
         lastModifiedAt = previous.modifiedAt;
         previousModifiedAt = previous.modifiedAt;
     }
@@ -89,7 +89,7 @@ if (lastModifiedAt) {
 
 // Create the output JSON
 const result = {
-    megacloud: key,
+    decryptKey: key,
     modifiedAt: new Date().toISOString(),
     previousModifiedAt,
     elapsedSeconds
