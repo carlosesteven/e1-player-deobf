@@ -10,32 +10,41 @@ const keyMatch = code.match(/D\s*=\s*["'`](--)?([0-9a-fA-F]{64})["'`]/);
 let key = null;
 
 if (keyMatch) {
-    // If found, extract the key, removing the "--" prefix if present
     key = keyMatch[2];
     console.log("Key found directly:", key);
 } else {
-    // Otherwise, search for the arrays as before (legacy logic)
-    const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
-    let rArray = null, aArray = null;
+    // Try to find an array of 64 hex strings (e.g., O = ["30", ...])
+    const arrayMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[((?:"[0-9a-fA-F]{2}",?\s*){64})\]/);
 
-    for (const m of rMatch || []) {
-        if (/"[\da-f]+"/.test(m) && m.split(',').length > 10) {
-            if (!rArray) rArray = m;
-        } else if (/(\d+, *){3,}/.test(m)) {
-            if (!aArray) aArray = m;
+    if (arrayMatch) {
+        // Get all hex strings from the array and concatenate them
+        const hexStrings = arrayMatch[0].match(/"([0-9a-fA-F]{2})"/g).map(s => s.replace(/"/g, ''));
+        key = hexStrings.join('');
+        console.log("Key built from array of hex strings:", key);
+    } else {
+        // Otherwise, search for the arrays as before (legacy logic)
+        const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
+        let rArray = null, aArray = null;
+
+        for (const m of rMatch || []) {
+            if (/"[\da-f]+"/.test(m) && m.split(',').length > 10) {
+                if (!rArray) rArray = m;
+            } else if (/(\d+, *){3,}/.test(m)) {
+                if (!aArray) aArray = m;
+            }
         }
+
+        if (!rArray || !aArray) {
+            console.error("Could not find the arrays or direct variable.");
+            process.exit(1);
+        }
+
+        const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+        const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+
+        key = aValues.map(n => rValues[n]).join('');
+        console.log("Key reconstructed (legacy method):", key);
     }
-
-    if (!rArray || !aArray) {
-        console.error("Could not find the arrays or direct variable.");
-        process.exit(1);
-    }
-
-    const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
-    const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
-
-    key = aValues.map(n => rValues[n]).join('');
-    console.log("Key reconstructed:", key);
 }
 
 // Validate the key
