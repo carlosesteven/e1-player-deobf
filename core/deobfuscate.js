@@ -1,12 +1,12 @@
 import fs from 'fs';
 import * as babel from '@babel/core';
-import { normalizeLiterals } from './transformers/normalizeLiterals.js';
-import { controlFlowUnflattener } from './transformers/controlFlowUnflattener.js';
+import { normalizeLiterals } from '../transformers/normalizeLiterals.js';
+import { controlFlowUnflattener } from '../transformers/controlFlowUnflattener.js';
 import { inlineArrayBuilder } from './transformers/inlineArrayBuilder.js';
-import { inlineWrapperFunctions } from './transformers/inlineProxiedFunctions.js';
-import { solveStringArray } from './transformers/solveStringArray.js';
-import { solveStateMachine } from './transformers/solveStateMachine.js';
-import { inlineStringArray } from './transformers/inlineStringArray.js';
+import { inlineWrapperFunctions } from '../transformers/inlineProxiedFunctions.js';
+import { solveStringArray } from '../transformers/solveStringArray.js';
+import { solveStateMachine } from '../transformers/solveStateMachine.js';
+import { inlineStringArray } from '../transformers/inlineStringArray.js';
 
 import path from 'path';
 
