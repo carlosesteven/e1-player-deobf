@@ -3,30 +3,41 @@ import fs from 'fs';
 // Lee el archivo de JS desofuscado
 const code = fs.readFileSync('output.js', 'utf-8');
 
-// Busca los arrays tipo r/K y a/n
-const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
-let rArray = null, aArray = null;
+// Busca si hay una key tipo D = "--abc123..."; (hex string con prefijo "--")
+const keyMatch = code.match(/D\s*=\s*["'`](--)?([0-9a-fA-F]{64})["'`]/);
 
-for (const m of rMatch || []) {
-    if (/"[\da-f]+"/.test(m) && m.split(',').length > 10) {
-        if (!rArray) rArray = m;
-    } else if (/(\d+, *){3,}/.test(m)) {
-        if (!aArray) aArray = m;
+let key = null;
+
+if (keyMatch) {
+    // Si encuentra, extrae la key quitando el prefijo "--" si lo tiene
+    key = keyMatch[2];
+    console.log("Key encontrada directamente:", key);
+} else {
+    // Si no, busca los arrays como antes (lógica previa)
+    const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
+    let rArray = null, aArray = null;
+
+    for (const m of rMatch || []) {
+        if (/"[\da-f]+"/.test(m) && m.split(',').length > 10) {
+            if (!rArray) rArray = m;
+        } else if (/(\d+, *){3,}/.test(m)) {
+            if (!aArray) aArray = m;
+        }
     }
+
+    if (!rArray || !aArray) {
+        console.error("No se encontraron los arrays ni la variable directa.");
+        process.exit(1);
+    }
+
+    const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+    const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+
+    key = aValues.map(n => rValues[n]).join('');
+    console.log("Key reconstruida:", key);
 }
 
-if (!rArray || !aArray) {
-    console.error("No se encontraron los arrays.");
-    process.exit(1);
-}
-
-const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
-const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
-
-const key = aValues.map(n => rValues[n]).join('');
-console.log("Key:", key);
-console.log("Length:", key.length);
-
+// Valida la key
 const isValidKey = key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
 
 if (!isValidKey) {
