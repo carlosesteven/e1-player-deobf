@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { sendErrorEmail } from './send-email.js';
+import { sendErrorEmail, sendNewKeyEmail } from './send-email.js';
 import { fileURLToPath } from 'url';
 
 async function main() {
@@ -157,6 +157,18 @@ async function main() {
     console.log('Previous date:', previousModifiedAt);
 
     console.log('Time since last generation:', elapsedSeconds, 'seconds');
+
+    await sendNewKeyEmail(
+        key,
+        [
+            `Previous key: ${lastKey || 'none'}`,
+            `Time since last: ${elapsedSeconds ?? 'unknown'} seconds.`,
+            `You can check the latest file here:`,
+            `https://raw.githubusercontent.com/carlosesteven/e1-player-deobf/main/output/key.json`,
+            `See full commit history:`,
+            `https://github.com/carlosesteven/e1-player-deobf/commits/main/output/key.json`
+        ].join('\n\n')
+    );
 }
 
 main();
