@@ -182,7 +182,7 @@ export const solveStateMachine = {
           const argValues = path.get('arguments').map(p => {
               const evalResult = p.evaluate();
               if (!evalResult.confident) {
-                  throw new Error(`Argument ${gen(p.node)} could not be evaluated confidently.`);
+                console.error(`Argument ${gen(p.node)} could not be evaluated confidently.`);
               }
               return evalResult.value;
           });
