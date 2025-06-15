@@ -1,6 +1,8 @@
 output/*.txt
 output/*.js
 
+package-lock.json
+
 # Logs
 logs
 *.log
