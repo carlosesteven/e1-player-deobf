@@ -10,7 +10,7 @@ export async function sendErrorEmail(mensajeExtra = '') {
     const hora = new Date().toLocaleString('en-US', { hour12: false, timeZone: 'America/Bogota' });
 
     if (!correo_remitente || !password_remitente || !correo_destinatario.length || !host_correo) {
-        console.error("Faltan variables de entorno para el envío de correo.");
+        console.error("Missing environment variables for sending email.");
         return;
     }
 
