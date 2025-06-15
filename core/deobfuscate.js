@@ -10,9 +10,10 @@ import { inlineStringArray } from '../transformers/inlineStringArray.js';
 
 import path from 'path';
 
-const inputDir = '../output';
-const inputFile = path.join(inputDir, 'input.txt');
-const outputFile = path.join(inputDir, 'output.js');
+const repoRoot = path.resolve(__dirname, '..'); // si el archivo está en core/
+const outputDir = path.join(repoRoot, 'output');
+const inputFile = path.join(outputDir, 'input.txt');
+const outputFile = path.join(outputDir, 'output.js');
 
 try {
     let intermediateCode;

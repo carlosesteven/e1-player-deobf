@@ -3,8 +3,11 @@ import fs from 'fs';
 import path from 'path';
 
 const timestamp = Date.now();
+
 const url = `https://megacloud.blog/js/player/a/v2/pro/embed-1.min.js?v=${timestamp}`;
-const outputDir = '../output';
+
+const repoRoot = path.resolve(__dirname, '..'); // Si este archivo está en /core
+const outputDir = path.join(repoRoot, 'output');
 const outputFile = path.join(outputDir, 'input.txt');
 
 // Ensure the output directory exists

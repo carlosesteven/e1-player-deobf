@@ -12,12 +12,11 @@ export async function sendErrorEmail(mensajeExtra = '') {
     const transporter = nodemailer.createTransport({
         host: host_correo,
         port: 587,
-        secure: false, // STARTTLS
+        secure: false, 
         auth: {
             user: correo_remitente,
             pass: password_remitente
         }
-        // No es necesario tls: { ciphers: ... }
     });
 
     const mailOptions = {
