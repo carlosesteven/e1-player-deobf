@@ -4,7 +4,7 @@ import path from 'path';
 
 const timestamp = Date.now();
 const url = `https://megacloud.blog/js/player/a/v2/pro/embed-1.min.js?v=${timestamp}`;
-const outputDir = 'output';
+const outputDir = '../output';
 const outputFile = path.join(outputDir, 'input.txt');
 
 // Ensure the output directory exists

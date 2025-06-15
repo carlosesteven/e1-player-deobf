@@ -3,8 +3,10 @@ import path from 'path';
 import { sendErrorEmail } from './send-email.js';
 
 async function main() {
+    const outputDir = '../output';
+
     // Read the deobfuscated JS file from output/output.js
-    const code = fs.readFileSync(path.join('output', 'output.js'), 'utf-8');
+    const code = fs.readFileSync(path.join(outputDir, 'output.js'), 'utf-8');
 
     // Look for a key like D = "--abc123..."; (hex string with "--" prefix)
     const keyMatch = code.match(/D\s*=\s*["'`](--)?([0-9a-fA-F]{64})["'`]/);
@@ -75,7 +77,7 @@ async function main() {
     }
 
     // Set output key file location
-    const keyFile = path.join('output', 'key.json');
+    const keyFile = path.join(outputDir, 'key.json');
 
     // Try reading the existing file to compare
     let lastKey = null;
