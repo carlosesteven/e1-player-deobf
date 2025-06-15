@@ -48,7 +48,7 @@ if (keyMatch) {
 }
 
 // Validate the key
-const isValidKey = key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
+const isValidKey = (key.length === 64 && /^[0-9a-fA-F]+$/.test(key)) || ((key.length === 64 || key.length === 128) && /^[0-9a-fA-F]+$/.test(key));
 
 if (!isValidKey) {
     console.error("The generated key is NOT valid. The file will not be saved.");
