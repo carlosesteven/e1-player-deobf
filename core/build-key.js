@@ -46,30 +46,49 @@ async function main() {
                 process.exit(1);
             }
         } else {
-            // Otherwise, search for the arrays as before (legacy logic)
-            const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
-            let rArray = null, aArray = null;
+            const decimalArrayMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[((?:\d+,?\s*){64})\]/);
+            if (decimalArrayMatch) {
+                const decNumbers = decimalArrayMatch[0].match(/\d+/g).map(Number);
+                const asciiKey = decNumbers.map(n => String.fromCharCode(n)).join('');
+                const hexKey = decNumbers.map(n => n.toString(16).padStart(2, '0')).join('');
 
-            for (const m of rMatch || []) {
-                if (/"[\da-f]+"/.test(m) && m.split(',').length > 10) {
-                    if (!rArray) rArray = m;
-                } else if (/(\d+, *){3,}/.test(m)) {
-                    if (!aArray) aArray = m;
+                if (/^[\x20-\x7E]{64}$/.test(asciiKey)) {
+                    key = asciiKey;
+                    console.log("Key built from array of decimal numbers (as ASCII):", key);
+                } else if (hexKey.length === 128 && /^[0-9a-fA-F]+$/.test(hexKey)) {
+                    key = hexKey;
+                    console.log("Key built from array of decimal numbers (as HEX):", key);
+                } else {
+                    console.error("Array of decimal numbers found, but neither ASCII nor HEX version is valid.");
+                    await sendErrorEmail("Array of decimal numbers found, but neither ASCII nor HEX version is valid.");
+                    process.exit(1);
                 }
-            }
+            } else {
+                // Otherwise, search for the arrays as before (legacy logic)
+                const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
+                let rArray = null, aArray = null;
 
-            if (!rArray || !aArray) {
-                console.error("Could not find the arrays or direct variable.");
-                await sendErrorEmail("Could not find the arrays or direct variable.");
-                process.exit(1);
-            }
+                for (const m of rMatch || []) {
+                    if (/"[\da-f]+"/.test(m) && m.split(',').length > 10) {
+                        if (!rArray) rArray = m;
+                    } else if (/(\d+, *){3,}/.test(m)) {
+                        if (!aArray) aArray = m;
+                    }
+                }
 
-            const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
-            const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+                if (!rArray || !aArray) {
+                    console.error("Could not find the arrays or direct variable.");
+                    await sendErrorEmail("Could not find the arrays or direct variable.");
+                    process.exit(1);
+                }
 
-            key = aValues.map(n => rValues[n]).join('');
-            
-            console.log("Key reconstructed (legacy method):", key);
+                const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+                const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+
+                key = aValues.map(n => rValues[n]).join('');
+                
+                console.log("Key reconstructed (legacy method):", key);
+            }            
         }
     }
 
