@@ -1,19 +1,22 @@
 #!/bin/bash
 
-set -e  # Hace que el script se detenga si hay un error
+set -e  # Stop the script if any command fails
 
-# Ejecuta la secuencia de Node.js
+# Pull latest changes from the repository
+git pull
+
+# Run the Node.js sequence
 node download-input.js
 node deobfuscate.js
 node build-key.js
 
-# Agrega todos los cambios a git
+# Add all changes to git
 git add .
 
-# Haz el commit con fecha y hora actual
+# Commit with current date and time
 git commit -m "Automated update: $(date '+%Y-%m-%d %H:%M:%S')"
 
-# Sube los cambios
+# Push the changes
 git push
 
-echo "Todo listo: Secuencia ejecutada y cambios subidos a GitHub."
+echo "All done: Sequence executed and changes pushed to GitHub."
