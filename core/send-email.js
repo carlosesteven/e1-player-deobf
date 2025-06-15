@@ -9,6 +9,11 @@ export async function sendErrorEmail(mensajeExtra = '') {
     const host_correo = process.env.MAIL_HOST;
     const hora = new Date().toLocaleString('en-US', { hour12: false, timeZone: 'America/Bogota' });
 
+    if (!correo_remitente || !password_remitente || !correo_destinatario.length || !host_correo) {
+        console.error("Faltan variables de entorno para el envío de correo.");
+        return;
+    }
+
     const transporter = nodemailer.createTransport({
         host: host_correo,
         port: 587,
