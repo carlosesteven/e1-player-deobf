@@ -5,7 +5,10 @@ set -e  # Stop the script if any command fails
 # Pull latest changes from the repository
 git pull
 
-# Run the Node.js sequence (notar core/)
+# Install updated dependencies
+npm install
+
+# Run the Node.js sequence (nota: están en core/)
 node core/download-input.js
 node core/deobfuscate.js
 node core/build-key.js
