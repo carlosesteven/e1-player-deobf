@@ -14,6 +14,8 @@ async function main() {
     // Read the deobfuscated JS file from output/output.js
     const code = fs.readFileSync(path.join(outputDir, 'output.js'), 'utf-8');
 
+    const aiMarkerFile = path.join(outputDir, 'ai-last-run.json');
+
     // This regex supports and extracts the decryption key regardless of leading or trailing dashes,
     // handling all formats like: "key", "-key", "--key", "key-", "key--", "-key-", "--key--" (and all combinations).
     const keyMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]-*([0-9a-fA-F]{64})-*["'`]/);
@@ -137,8 +139,25 @@ async function main() {
 
     if (!isValidKey) {
         console.error("The generated key is NOT valid. The file will not be saved.");
-        
+
         await sendErrorEmail();
+
+        let lastRun = 0;
+        if (fs.existsSync(aiMarkerFile)) {
+            try {
+                const info = JSON.parse(fs.readFileSync(aiMarkerFile, 'utf8'));
+                lastRun = new Date(info.lastRun).getTime();
+            } catch {}
+        }
+
+        const now = Date.now();
+
+        const HOUR = 60 * 60 * 1000;
+
+        if (now - lastRun < HOUR) {
+            console.log("AI backup was already run less than 1 hour ago. Skipping AI execution.");
+            process.exit(0); 
+        }
 
         try {
             execSync('node core/build-key-ai.js', { stdio: 'inherit' });

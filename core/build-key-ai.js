@@ -21,6 +21,7 @@ const outputDir = path.join(repoRoot, 'output');
 const inputFile = path.join(outputDir, 'input.txt');
 const outputFile = path.join(outputDir, 'output.js');
 const keyFile = path.join(outputDir, 'key.json');
+const aiMarkerFile = path.join(outputDir, 'ai-last-run.json');
 
 async function generateContent(prompt) {
   try {
@@ -94,7 +95,7 @@ async function main() {
     let finalKey = new Function(final_code)();
 
     console.log("\nFinal key is: ");
-    
+
     console.log(finalKey + "\n");
 
     if (typeof finalKey !== "string" || !/^[0-9a-fA-F]{64}$/.test(finalKey)) {
@@ -140,9 +141,13 @@ async function main() {
         elapsedSeconds
     };
 
-    fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
+    fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');    
+    
+    fs.writeFileSync(aiMarkerFile, JSON.stringify({ lastRun: new Date().toISOString() }), 'utf-8');
 
     console.log('Key successfully written to key.json.');
+
+    console.log('AI marker file updated:', aiMarkerFile);
   } catch (error) {
     console.error("Error in main.", error);
   }
