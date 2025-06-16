@@ -99,12 +99,12 @@ async function main() {
       console.error("Extracted key is not a valid 64-char hex string. Not saving.");
       return;
     }
-    // ========== BLOQUE NUEVO CORRECTO ==========
+
     let lastKey = null;
     let lastModifiedAt = null;
     let previousModifiedAt = null;
     let elapsedSeconds = null;
-    
+
     try {
         if (fs.existsSync(keyFile)) {
             const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
@@ -139,8 +139,8 @@ async function main() {
     };
 
     fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
+    
     console.log('Key successfully written to key.json.');
-    // ========== FIN BLOQUE NUEVO CORRECTO ==========
   } catch (error) {
     console.error("Error in main.", error);
   }
