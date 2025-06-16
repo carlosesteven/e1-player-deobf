@@ -105,36 +105,36 @@ async function main() {
     let previousModifiedAt = null;
     let elapsedSeconds = null;
     try {
-    if (fs.existsSync(keyFile)) {
-        const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
-        lastKey = previous.decryptKey;
-        lastModifiedAt = previous.modifiedAt;
-        previousModifiedAt = previous.modifiedAt;
-    }
+        if (fs.existsSync(keyFile)) {
+            const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
+            lastKey = previous.decryptKey;
+            lastModifiedAt = previous.modifiedAt;
+            previousModifiedAt = previous.modifiedAt;
+        }
     } catch (err) {}
 
     if (lastKey === finalKey) {
-    console.log('The key has not changed, the file will not be updated.');
-    return;
+        console.log('The key has not changed, the file will not be updated.');
+        return;
     }
 
     if (lastModifiedAt) {
-    try {
-        const lastDate = new Date(lastModifiedAt).getTime();
-        const now = Date.now();
-        if (!isNaN(lastDate)) {
-        elapsedSeconds = Math.floor((now - lastDate) / 1000);
+        try {
+            const lastDate = new Date(lastModifiedAt).getTime();
+            const now = Date.now();
+            if (!isNaN(lastDate)) {
+            elapsedSeconds = Math.floor((now - lastDate) / 1000);
+            }
+        } catch (err) {
+            elapsedSeconds = null;
         }
-    } catch (err) {
-        elapsedSeconds = null;
-    }
     }
 
     const result = {
-    decryptKey: finalKey,
-    modifiedAt: new Date().toISOString(),
-    previousModifiedAt,
-    elapsedSeconds
+        decryptKey: finalKey,
+        modifiedAt: new Date().toISOString(),
+        previousModifiedAt,
+        elapsedSeconds
     };
 
     fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
