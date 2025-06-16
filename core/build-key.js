@@ -32,7 +32,6 @@ async function main() {
         // Regex para detectar un string base64
         const base64Match = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]([A-Za-z0-9+/=]{86,89})["'`]/);
 
-
         if (base64Match) {
             const possibleKey = base64Match[2];
             let decoded = null;
