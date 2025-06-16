@@ -2,6 +2,7 @@
 
 set -e  # Stop the script if any command fails
 
+# Set location
 cd "$(dirname "$0")"
 
 # Pull latest changes from the repository
