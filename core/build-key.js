@@ -14,13 +14,14 @@ async function main() {
     // Read the deobfuscated JS file from output/output.js
     const code = fs.readFileSync(path.join(outputDir, 'output.js'), 'utf-8');
 
-    // Look for a key like D = "--abc123..."; (hex string with "--" prefix)
-    const keyMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`](-{0,2})([0-9a-fA-F]{64})["'`]/);
+    // This regex supports and extracts the decryption key regardless of leading or trailing dashes,
+    // handling all formats like: "key", "-key", "--key", "key-", "key--", "-key-", "--key--" (and all combinations).
+    const keyMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]-{0,2}([0-9a-fA-F]{64})-{0,2}["'`]/);
 
     let key = null;
 
     if (keyMatch) {
-        key = keyMatch[3];
+        key = keyMatch[2];
         console.log("Key found directly:", key);
     } else {
         // Try to find an array of 64 hex strings (e.g., O = ["30", ...])
