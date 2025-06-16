@@ -27,7 +27,23 @@ async function main() {
         // Try to find an array of 64 hex strings (e.g., O = ["30", ...])
         const arrayMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[((?:"[0-9a-fA-F]{2}",?\s*){64})\]/);
 
-        if (arrayMatch) {
+        // Regex para detectar un string base64
+        const base64Match = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]([A-Za-z0-9+/=]{86,89})["'`]/);
+
+        if (base64Match) {
+            // Opcional: validar longitud después de decodificar
+            const possibleKey = base64Match[2];
+            let decoded;
+            try {
+                decoded = Buffer.from(possibleKey, 'base64').toString('hex');
+            } catch (e) {
+                decoded = null;
+            }
+            if (decoded && decoded.length === 128) {
+                key = decoded;
+                console.log("Key found as base64 and converted to hex:", key);
+            }
+        }else if (arrayMatch) {
             const hexStrings = arrayMatch[0].match(/"([0-9a-fA-F]{2})"/g).map(s => s.replace(/"/g, ''));
             // Opción 1: key como texto ASCII
             const asciiKey = hexStrings.map(h => String.fromCharCode(parseInt(h, 16))).join('');
