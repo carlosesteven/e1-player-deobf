@@ -137,8 +137,17 @@ async function main() {
 
     if (!isValidKey) {
         console.error("The generated key is NOT valid. The file will not be saved.");
+        
         await sendErrorEmail();
-        process.exit(1);
+
+        try {
+            execSync('node core/build-key-ai.js', { stdio: 'inherit' });
+        } catch (err) {
+            console.error("AI BACKUP SCRIPT FAILED!", err);
+            process.exit(1);
+        }
+
+        process.exit(0);
     }
 
     // Set output key file location
