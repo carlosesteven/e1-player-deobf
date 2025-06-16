@@ -2,6 +2,8 @@
 
 set -e  # Stop the script if any command fails
 
+cd "$(dirname "$0")"
+
 # Pull latest changes from the repository
 git pull
 
