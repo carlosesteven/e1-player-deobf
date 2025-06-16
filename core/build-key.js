@@ -15,12 +15,12 @@ async function main() {
     const code = fs.readFileSync(path.join(outputDir, 'output.js'), 'utf-8');
 
     // Look for a key like D = "--abc123..."; (hex string with "--" prefix)
-    const keyMatch = code.match(/D\s*=\s*["'`](--)?([0-9a-fA-F]{64})["'`]/);
+    const keyMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`](-{0,2})([0-9a-fA-F]{64})["'`]/);
 
     let key = null;
 
     if (keyMatch) {
-        key = keyMatch[2];
+        key = keyMatch[3];
         console.log("Key found directly:", key);
     } else {
         // Try to find an array of 64 hex strings (e.g., O = ["30", ...])
