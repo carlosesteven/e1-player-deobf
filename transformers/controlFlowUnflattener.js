@@ -34,7 +34,7 @@ export const controlFlowUnflattener = {
                 const switchStatement = node.body.body[0];
                 if (!t.isSwitchStatement(switchStatement) || !t.isNodesEquivalent(switchStatement.discriminant, stateVar)) return;
 
-                console.log(`[UNFLATTEN] Found state machine with terminal value: ${terminalValue}`);
+                //console.log(`[UNFLATTEN] Found state machine with terminal value: ${terminalValue}`);
 
                 let initialState = null;
                 let initializerPath = null;
@@ -61,7 +61,7 @@ export const controlFlowUnflattener = {
                 }
                 if (initialState === null) return;
 
-                console.log(`[UNFLATTEN] Initial state: ${initialState}`);
+                //console.log(`[UNFLATTEN] Initial state: ${initialState}`);
 
                 const caseMap = new Map();
                 for (const switchCase of switchStatement.cases) {
@@ -70,7 +70,7 @@ export const controlFlowUnflattener = {
                     caseMap.set(switchCase.test.value, caseBody);
                 }
 
-                console.log(`[UNFLATTEN] Found ${caseMap.size} switch cases`);
+                //console.log(`[UNFLATTEN] Found ${caseMap.size} switch cases`);
 
                 let success = true;
                 const hoistedVars = new Set();
@@ -155,7 +155,7 @@ export const controlFlowUnflattener = {
                     }
                     newNodes.push(...unflattenedBody);
 
-                    console.log(`[UNFLATTEN] Successfully unflattened state machine. Generated ${newNodes.length} nodes.`);
+                    //console.log(`[UNFLATTEN] Successfully unflattened state machine. Generated ${newNodes.length} nodes.`);
                     path.replaceWithMultiple(newNodes);
                     
                     if (initializerPath.isVariableDeclaration()) {
@@ -172,7 +172,7 @@ export const controlFlowUnflattener = {
                         initializerPath.remove();
                     }
                 } else {
-                    console.log('[UNFLATTEN] Failed to unflatten state machine');
+                    //console.log('[UNFLATTEN] Failed to unflatten state machine');
                 }
             }
         }

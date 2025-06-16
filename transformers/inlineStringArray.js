@@ -20,11 +20,11 @@ export const inlineStringArray = {
       enter(path, state) {
         state.arrayInfo = null;
         state.pathsToRemove = new Set();
-        console.log("[INLINE-STR] Starting final inlining pass...");
+        //console.log("[INLINE-STR] Starting final inlining pass...");
       },
       exit(path, state) {
         if (state.pathsToRemove.size > 0) {
-            console.log(`[INLINE-STR] Cleanup: Removing ${state.pathsToRemove.size} original array definitions.`);
+            //console.log(`[INLINE-STR] Cleanup: Removing ${state.pathsToRemove.size} original array definitions.`);
             Array.from(state.pathsToRemove).reverse().forEach(p => {
                 if (p && !p.removed) {
                     try { p.remove(); } catch (e) { }
@@ -69,10 +69,10 @@ export const inlineStringArray = {
           state.arrayInfo = { objectName, accessorName, theArray };
           state.pathsToRemove.add(path.getStatementParent());
 
-          console.log(`\n[INLINE-STR] Successfully parsed literal array!`);
-          console.log(`[INLINE-STR] - Object Name:   '${objectName}'`);
-          console.log(`[INLINE-STR] - Accessor Name: '${accessorName}'`);
-          console.log(`[INLINE-STR] - Array Size:    ${theArray.length}\n`);
+          //console.log(`\n[INLINE-STR] Successfully parsed literal array!`);
+          //console.log(`[INLINE-STR] - Object Name:   '${objectName}'`);
+          //console.log(`[INLINE-STR] - Accessor Name: '${accessorName}'`);
+          //console.log(`[INLINE-STR] - Array Size:    ${theArray.length}\n`);
         }
       });
     },
@@ -97,16 +97,16 @@ export const inlineStringArray = {
             const replacementNode = safeValueToNode(resolvedValue);
 
             if (replacementNode) {
-                console.log(`[INLINE-STR] Inlining ${gen(path.node)} -> ${gen(replacementNode)}`);
+                //console.log(`[INLINE-STR] Inlining ${gen(path.node)} -> ${gen(replacementNode)}`);
                 path.replaceWith(replacementNode);
             } else {
-                console.warn(`[INLINE-STR] Could not create a literal node for value at index ${index}.`);
+                //console.warn(`[INLINE-STR] Could not create a literal node for value at index ${index}.`);
             }
           } else {
-            console.warn(`[INLINE-STR] Index ${index} is out of bounds.`);
+            //console.warn(`[INLINE-STR] Index ${index} is out of bounds.`);
           }
         } else {
-          console.warn(`[INLINE-STR] Could not statically resolve index for call: ${gen(path.node)}`);
+          //console.warn(`[INLINE-STR] Could not statically resolve index for call: ${gen(path.node)}`);
         }
       }
     }

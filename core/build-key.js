@@ -24,7 +24,17 @@ async function main() {
 
     if (keyMatch) {
         key = keyMatch[2];
-        console.log("Key found directly:", key);
+        const varName = keyMatch[1];
+        const reverseUsage = new RegExp(
+            `${varName}\.split\s*\(\s*['"]?['"]?\s*\)\s*\.reverse\s*\(\s*\)\s*\.join\s*\(\s*['"]?['"]?\s*\)`,
+            "m"
+        );
+        if (reverseUsage.test(code)) {
+            key = key.split('').reverse().join('');
+            console.log("Key found as reversed literal:", key);
+        } else {
+            console.log("Key found directly:", key);
+        }
     } else {
         // Try to find an array of 64 hex strings (e.g., O = ["30", ...])
         const arrayMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[((?:"[0-9a-fA-F]{2}",?\s*){64})\]/);

@@ -61,7 +61,7 @@ export const solveStateMachine = {
 
     AssignmentExpression(path, state) {
       if (state.stateMachineInfo) return;
-      console.log(`[STATE-MACHINE] Checking AssignmentExpression: ${gen(path.node.left)} = ...`);
+      //console.log(`[STATE-MACHINE] Checking AssignmentExpression: ${gen(path.node.left)} = ...`);
 
       const right = path.get('right');
       if (!right.isCallExpression() || !right.get('callee').isFunctionExpression()) {
@@ -124,14 +124,14 @@ export const solveStateMachine = {
       
       if (setterName && calculatorName && logicMap.size > 0) {
         state.stateMachineInfo = { objectName: gen(path.node.left), setterName, calculatorName, logicMap };
-        console.log(`\n[STATE-MACHINE] State Machine fully parsed!`);
-        console.log(`   - Object Name: '${state.stateMachineInfo.objectName}'`);
-        console.log(`   - Setter Fn:   '${setterName}'`);
-        console.log(`   - Calculator Fn: '${calculatorName}'`);
-        console.log(`   - Logic map size: ${logicMap.size}\n`);
+        //console.log(`\n[STATE-MACHINE] State Machine fully parsed!`);
+        //console.log(`   - Object Name: '${state.stateMachineInfo.objectName}'`);
+        //console.log(`   - Setter Fn:   '${setterName}'`);
+        //console.log(`   - Calculator Fn: '${calculatorName}'`);
+        //console.log(`   - Logic map size: ${logicMap.size}\n`);
         path.getStatementParent().remove();
       } else {
-        console.log(`  -> [FAIL] Could not identify both a setter and a calculator from the properties.`);
+        //console.log(`  -> [FAIL] Could not identify both a setter and a calculator from the properties.`);
       }
     },
 
@@ -155,44 +155,44 @@ export const solveStateMachine = {
           const evaluation = stateArg.evaluate();
           if (evaluation.confident) {
             state.currentMachineState = evaluation.value;
-            console.log(`[STATE-MACHINE] State set to: ${state.currentMachineState} from call ${gen(path.node)}`);
+            //console.log(`[STATE-MACHINE] State set to: ${state.currentMachineState} from call ${gen(path.node)}`);
             if (path.parentPath.isExpressionStatement()) {
               path.parentPath.remove();
             } else {
               path.replaceWith(t.identifier("undefined"));
             }
           } else {
-            console.warn(`[STATE-MACHINE] Could not determine state value for: ${gen(path.node)}`);
+            //console.warn(`[STATE-MACHINE] Could not determine state value for: ${gen(path.node)}`);
           }
         }
 
         if (propName === info.calculatorName) {
           const currentState = state.currentMachineState;
           if (currentState === null) {
-            console.warn(`[STATE-MACHINE] Calculator called before state was set: ${gen(path.node)}`);
+            //console.warn(`[STATE-MACHINE] Calculator called before state was set: ${gen(path.node)}`);
             return;
           }
 
           const logicNode = info.logicMap.get(currentState);
           if (!logicNode) {
-            console.warn(`[STATE-MACHINE] No logic for state ${currentState} in call: ${gen(path.node)}`);
+            //console.warn(`[STATE-MACHINE] No logic for state ${currentState} in call: ${gen(path.node)}`);
             return;
           }
 
           const argValues = path.get('arguments').map(p => {
               const evalResult = p.evaluate();
               if (!evalResult.confident) {
-                console.error(`Argument ${gen(p.node)} could not be evaluated confidently.`);
+                //console.error(`Argument ${gen(p.node)} could not be evaluated confidently.`);
               }
               return evalResult.value;
           });
 
           try {
             const result = evaluateAstNode(logicNode, argValues);
-            console.log(`[STATE-MACHINE] Solved ${gen(path.node)} with state ${currentState} => ${result}`);
+            //console.log(`[STATE-MACHINE] Solved ${gen(path.node)} with state ${currentState} => ${result}`);
             path.replaceWith(t.valueToNode(result));
           } catch (e) {
-            console.error(`[STATE-MACHINE] Failed evaluation for ${gen(path.node)}: ${e.message}`);
+            //console.error(`[STATE-MACHINE] Failed evaluation for ${gen(path.node)}: ${e.message}`);
           }
         }
       }

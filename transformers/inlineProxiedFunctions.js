@@ -76,12 +76,12 @@ export const inlineWrapperFunctions = {
       });
       
       if (candidateFrequencies.size === 0) {
-        console.log('[INLINE-PROXY] No wrapper functions found. Halting.');
+        //console.log('[INLINE-PROXY] No wrapper functions found. Halting.');
         return;
       }
       
       const baseObjectName = [...candidateFrequencies.entries()].reduce((a, b) => b[1] > a[1] ? b : a)[0];
-      console.log(`[INLINE-PROXY] Discovery complete. Base Object is "${baseObjectName}".`);
+      //console.log(`[INLINE-PROXY] Discovery complete. Base Object is "${baseObjectName}".`);
 
       const baseObjectAliases = new Set([baseObjectName]);
       const wrapperMap = new Map();
@@ -118,13 +118,13 @@ export const inlineWrapperFunctions = {
                 const wrapperKey = getMemberKey(callee);
                 if (wrapperKey !== null && wrapperMap.has(wrapperKey)) {
                     const targetMemberExpr = wrapperMap.get(wrapperKey);
-                    console.log(`[INLINE-PROXY] Inlining call to "${callee.object.name}[${wrapperKey}]"`);
+                    //console.log(`[INLINE-PROXY] Inlining call to "${callee.object.name}[${wrapperKey}]"`);
                     callPath.replaceWith(t.callExpression(targetMemberExpr, callPath.node.arguments));
                 }
             }
         }
       });
-      console.log('[INLINE-PROXY] Inlining complete.');
+      //console.log('[INLINE-PROXY] Inlining complete.');
     }
   }
 };
