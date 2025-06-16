@@ -123,8 +123,17 @@ async function main() {
         }
     }
 
+    // Si la key es de 128 hex, intenta convertirla a ASCII y usa solo si es válida de 64 hex
+    if (key && key.length === 128 && /^[0-9a-fA-F]{128}$/.test(key)) {
+        const asciiKey = Buffer.from(key, "hex").toString("ascii");
+        if (/^[0-9a-fA-F]{64}$/.test(asciiKey)) {
+            key = asciiKey;
+            console.log("Converted 128-hex to 64-char key:", key);
+        }
+    }
+
     // Validate the key
-    const isValidKey = (key.length === 64 && /^[0-9a-fA-F]+$/.test(key)) || ((key.length === 64 || key.length === 128) && /^[0-9a-fA-F]+$/.test(key));
+    const isValidKey = key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
 
     if (!isValidKey) {
         console.error("The generated key is NOT valid. The file will not be saved.");
