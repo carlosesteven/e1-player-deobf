@@ -1,4 +1,4 @@
-# E1 Player Deobfuscator
+# Deobfuscator
 
 This project undoes most of the key transformations done to obfuscate the e1-player.
 
