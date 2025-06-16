@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Ciarands/e1-player-deobf#readme",
   "dependencies": {
     "@babel/core": "^7.27.4",
+    "axios": "^1.10.0",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.5.0",
     "nodemailer": "^7.0.3"

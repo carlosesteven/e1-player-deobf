@@ -4,8 +4,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { exec } from "child_process";
 import { promisify } from "util";
+import 'dotenv/config';
 
 const API_KEY = process.env.API_KEY;
+
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
 const execAsync = promisify(exec);
@@ -51,7 +53,9 @@ async function main() {
     console.log("input.txt successfully written.");
 
     console.log("Running deobfuscate.js...");
-    await execAsync("node deobfuscate.js");
+
+    await execAsync("node core/deobfuscate.js");
+
     console.log("deobfuscate.js finished.");
 
     console.log("Reading output.js...");
@@ -95,42 +99,47 @@ async function main() {
       console.error("Extracted key is not a valid 64-char hex string. Not saving.");
       return;
     }
-    // ========== BLOQUE NUEVO ==========
+    // ========== BLOQUE NUEVO CORRECTO ==========
     let lastKey = null;
     let lastModifiedAt = null;
     let previousModifiedAt = null;
     let elapsedSeconds = null;
     try {
-      if (fs.existsSync(keyFile)) {
+    if (fs.existsSync(keyFile)) {
         const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
         lastKey = previous.decryptKey;
         lastModifiedAt = previous.modifiedAt;
         previousModifiedAt = previous.modifiedAt;
-      }
+    }
     } catch (err) {}
 
+    if (lastKey === finalKey) {
+    console.log('The key has not changed, the file will not be updated.');
+    return;
+    }
+
     if (lastModifiedAt) {
-      try {
+    try {
         const lastDate = new Date(lastModifiedAt).getTime();
         const now = Date.now();
         if (!isNaN(lastDate)) {
-          elapsedSeconds = Math.floor((now - lastDate) / 1000);
+        elapsedSeconds = Math.floor((now - lastDate) / 1000);
         }
-      } catch (err) {
+    } catch (err) {
         elapsedSeconds = null;
-      }
+    }
     }
 
     const result = {
-      decryptKey: finalKey,
-      modifiedAt: new Date().toISOString(),
-      previousModifiedAt,
-      elapsedSeconds
+    decryptKey: finalKey,
+    modifiedAt: new Date().toISOString(),
+    previousModifiedAt,
+    elapsedSeconds
     };
 
     fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
     console.log('Key successfully written to key.json.');
-    // ========== FIN BLOQUE NUEVO ==========
+    // ========== FIN BLOQUE NUEVO CORRECTO ==========
   } catch (error) {
     console.error("Error in main.", error);
   }
