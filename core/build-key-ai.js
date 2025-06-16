@@ -90,11 +90,13 @@ async function main() {
     )
       .join("\n")
       .replace("console.log", "return");
+
     let finalKey = new Function(final_code)();
+
     console.log("\nFinal key is: ");
+    
     console.log(finalKey + "\n");
 
-    // ========== Validación extra ==========
     if (typeof finalKey !== "string" || !/^[0-9a-fA-F]{64}$/.test(finalKey)) {
       console.error("Extracted key is not a valid 64-char hex string. Not saving.");
       return;
@@ -139,7 +141,7 @@ async function main() {
     };
 
     fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
-    
+
     console.log('Key successfully written to key.json.');
   } catch (error) {
     console.error("Error in main.", error);
