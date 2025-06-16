@@ -30,18 +30,32 @@ async function main() {
         // Regex para detectar un string base64
         const base64Match = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]([A-Za-z0-9+/=]{86,89})["'`]/);
 
+
         if (base64Match) {
-            // Opcional: validar longitud después de decodificar
             const possibleKey = base64Match[2];
-            let decoded;
+            let decoded = null;
             try {
-                decoded = Buffer.from(possibleKey, 'base64').toString('hex');
+                // 1. Intenta decodificar como ASCII (esperando una key printable)
+                const ascii = Buffer.from(possibleKey, 'base64').toString('ascii');
+                if (/^[\da-fA-F]{64}$/.test(ascii)) {
+                    key = ascii;
+                    console.log("Key found as base64 (decoded as ASCII/hex):", key);
+                } else {
+                    // 2. Si no, como hex (puede ser el "doble" pero eso no es válido)
+                    const hex = Buffer.from(possibleKey, 'base64').toString('hex');
+                    // Prueba a decodificar ese hex a ascii de nuevo (rara vez pasa)
+                    const asciiFromHex = Buffer.from(hex, 'hex').toString('ascii');
+                    if (/^[\da-fA-F]{64}$/.test(asciiFromHex)) {
+                        key = asciiFromHex;
+                        console.log("Key found as base64 (decoded as HEX→ASCII):", key);
+                    } else if (hex.length === 128) {
+                        // Último recurso: dejar hex de 128 pero no es lo estándar
+                        key = hex;
+                        console.log("Key found as base64 and converted to 128-char hex:", key);
+                    }
+                }
             } catch (e) {
                 decoded = null;
-            }
-            if (decoded && decoded.length === 128) {
-                key = decoded;
-                console.log("Key found as base64 and converted to hex:", key);
             }
         }else if (arrayMatch) {
             const hexStrings = arrayMatch[0].match(/"([0-9a-fA-F]{2})"/g).map(s => s.replace(/"/g, ''));
