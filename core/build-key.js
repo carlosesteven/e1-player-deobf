@@ -16,8 +16,7 @@ async function main() {
 
     // This regex supports and extracts the decryption key regardless of leading or trailing dashes,
     // handling all formats like: "key", "-key", "--key", "key-", "key--", "-key-", "--key--" (and all combinations).
-    // Permite cualquier cantidad de guiones antes o después del key:
-const keyMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]-*([0-9a-fA-F]{64})-*["'`]/);
+    const keyMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]-*([0-9a-fA-F]{64})-*["'`]/);
 
     let key = null;
 
