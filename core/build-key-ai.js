@@ -104,6 +104,7 @@ async function main() {
     let lastModifiedAt = null;
     let previousModifiedAt = null;
     let elapsedSeconds = null;
+    
     try {
         if (fs.existsSync(keyFile)) {
             const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
