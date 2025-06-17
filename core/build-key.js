@@ -61,10 +61,16 @@ async function main() {
         if (lastKeyTemp && (key === lastKeyTemp || reversedKey === lastKeyTemp)) {
             key = lastKeyTemp;
         }else{
+            console.log("");
+            console.log("");
             console.log("Key found directly:", key);
             const checkString = await getSources();
+            console.log("");
+            console.log("");
             console.log("checkString found:", checkString);
             let decrypted, plaintext, parsed;
+            console.log("");
+            console.log("");
             try {
                 decrypted = CryptoJS.AES.decrypt(checkString, key);
                 plaintext = decrypted.toString(CryptoJS.enc.Utf8);
@@ -117,20 +123,15 @@ async function main() {
             const hexStrings = arrayMatch[0].match(/"([0-9a-fA-F]{2})"/g).map(s => s.replace(/"/g, ''));
             const asciiKey = hexStrings.map(h => String.fromCharCode(parseInt(h, 16))).join('');
             const hexKey = hexStrings.join('');
-        
-            if (/^[\x20-\x7E]{64}$/.test(asciiKey)) { // 64 caracteres ASCII imprimibles
+            console.log("");
+            console.log("");
+            if (/^[\x20-\x7E]{64}$/.test(asciiKey)) { 
                 key = asciiKey;
-                console.log("");
-                console.log("");
                 console.log("Key built from array of hex strings (as ASCII):", key);
             } else if (hexKey.length === 128 && /^[0-9a-fA-F]+$/.test(hexKey)) {
                 key = hexKey;
-                console.log("");
-                console.log("");
                 console.log("Key built from array of hex strings (as HEX):", key);
             } else {
-                console.log("");
-                console.log("");
                 console.error("Array of hex strings found, but neither ASCII nor HEX version is valid.");
                 await sendErrorEmail("Array of hex strings found, but neither ASCII nor HEX version is valid.");
                 process.exit(1);
@@ -289,7 +290,7 @@ async function main() {
     console.log("");
     console.log("");
     console.log('Previous date:', previousModifiedAt);
-    
+
     console.log("");
     console.log("");
     console.log('Time since last generation:', elapsedSeconds, 'seconds');
