@@ -81,7 +81,7 @@ export const solveStateMachine = {
         return;
       }
 
-      console.log(`  -> [PASS] Found potential SM pattern with state var '${stateVarName}'`);
+      //console.log(`  -> [PASS] Found potential SM pattern with state var '${stateVarName}'`);
 
       let setterName, calculatorName, logicMap = new Map();
       
@@ -94,7 +94,7 @@ export const solveStateMachine = {
           const propName = key.isIdentifier() ? key.node.name : (key.isStringLiteral() ? key.node.value : null);
           if (!propName) continue;
 
-          console.log(`    -> Analyzing property: '${propName}'`);
+          //console.log(`    -> Analyzing property: '${propName}'`);
           const propBody = propValue.get('body.body');
 
           const assignmentStmt = propBody.find(stmt =>
@@ -104,19 +104,19 @@ export const solveStateMachine = {
           );
           if (propValue.get('params').length === 1 && assignmentStmt) {
               setterName = propName;
-              console.log(`      -> Identified as SETTER.`);
+              //console.log(`      -> Identified as SETTER.`);
           }
           
           const switchStmt = propBody.find(n => n.isSwitchStatement());
           if (switchStmt && switchStmt.get('discriminant').isIdentifier({ name: stateVarName })) {
               calculatorName = propName;
-              console.log(`      -> Identified as CALCULATOR. Parsing cases...`);
+              //console.log(`      -> Identified as CALCULATOR. Parsing cases...`);
               for (const switchCase of switchStmt.get('cases')) {
                   const assignment = switchCase.get('consequent').find(p => p.isExpressionStatement() && p.get('expression').isAssignmentExpression());
                   if (assignment && switchCase.get('test').isNumericLiteral()) {
                       const caseValue = switchCase.node.test.value;
                       logicMap.set(caseValue, assignment.get('expression.right').node);
-                      console.log(`        -> Stored logic for case ${caseValue}.`);
+                      //console.log(`        -> Stored logic for case ${caseValue}.`);
                   }
               }
           }
