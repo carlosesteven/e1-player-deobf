@@ -185,6 +185,21 @@ async function main() {
         }
     }
 
+    if (!key) {
+        // Nuevo método: búsqueda por fragmentos de la forma:
+        // b3["a"] = "VAL1"; b3["b"] = () => {...return "VAL2";}; b3["c"] = "VAL3";
+        // y combinación: key = VAL1 + VAL2 + VAL3;
+        const matchA = code.match(/["']a["']\s*:\s*["']([0-9a-fA-F]+)["']/) || code.match(/b3\["a"\]\s*=\s*["']([0-9a-fA-F]+)["']/);
+        const matchB = code.match(/return\s+["']([0-9a-fA-F]+)["']/);
+        const matchC = code.match(/["']c["']\s*:\s*["']([0-9a-fA-F]+)["']/) || code.match(/b3\["c"\]\s*=\s*["']([0-9a-fA-F]+)["']/);
+
+        if (matchA && matchB && matchC) {
+            key = matchA[1] + matchB[1] + matchC[1];
+            console.log('');
+            console.log('Key built from explicit string concat:', key);
+        }
+    }
+
     if (typeof key === 'string' && key.length === 128 && /^[0-9a-fA-F]{128}$/.test(key)) {
         const asciiKey = Buffer.from(key, "hex").toString("ascii");
         if (/^[0-9a-fA-F]{64}$/.test(asciiKey)) {
