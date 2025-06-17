@@ -199,6 +199,9 @@ async function main() {
             key = matchA[1] + matchB[1] + matchC[1];
             console.log('');
             console.log('Key built from explicit string concat:', key);
+        }else{
+            console.log("fallo xd");
+            
         }
     }
 
