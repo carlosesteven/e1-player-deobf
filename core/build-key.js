@@ -186,6 +186,8 @@ async function main() {
     }
 
     if (!key) {
+        console.log("entro xd");
+        
         // Nuevo método: búsqueda por fragmentos de la forma:
         // b3["a"] = "VAL1"; b3["b"] = () => {...return "VAL2";}; b3["c"] = "VAL3";
         // y combinación: key = VAL1 + VAL2 + VAL3;
