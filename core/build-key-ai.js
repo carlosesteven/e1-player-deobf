@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import { exec } from "child_process";
 import { promisify } from "util";
 import 'dotenv/config';
+import { sendNewKeyEmail } from './send-email.js';
 
 const API_KEY = process.env.API_KEY;
 
@@ -151,7 +152,7 @@ async function main() {
     console.log('AI marker file updated:', aiMarkerFile);
 
     await sendNewKeyEmail(
-        key,
+      finalKey,
         [
             `Previous key: ${lastKey || 'none'}`,
             `Time since last: ${elapsedSeconds ?? 'unknown'} seconds.`,
