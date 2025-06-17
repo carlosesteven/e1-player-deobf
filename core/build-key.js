@@ -218,6 +218,7 @@ async function main() {
                 console.log("Decimal array found, but not matching ASCII/HEX key lengths.");
             }
         }
+        process.exit(1);
     }
 
     const isValidKey = typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
