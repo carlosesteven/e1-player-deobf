@@ -50,6 +50,25 @@ async function main() {
         }
     }
 
+    function tryDecryptWithKeyOrReverse(checkString, keyCandidate) {
+        let decrypted;
+        try {
+            decrypted = CryptoJS.AES.decrypt(checkString, keyCandidate);
+            console.log("\n\nSuccess with external key:", keyCandidate);
+            return { decrypted, keyUsed: keyCandidate, reversed: false };
+        } catch (err) {
+            const reversedKey = keyCandidate.split('').reverse().join('');
+            try {
+                decrypted = CryptoJS.AES.decrypt(checkString, reversedKey);
+                console.log("\n\nSuccess with reversed external key:", reversedKey);
+                return { decrypted, keyUsed: reversedKey, reversed: true };
+            } catch (err2) {
+                console.log("\n\nFailed to decrypt with either the direct or reversed key.");
+                return null;
+            }
+        }
+    }
+
     const __filename = fileURLToPath(import.meta.url);
 
     const __dirname = path.dirname(__filename);
@@ -83,21 +102,19 @@ async function main() {
         if (lastKeyTemp && (key === lastKeyTemp || reversedKey === lastKeyTemp)) {
             key = lastKeyTemp;
         }else{
-            console.log("");
-            console.log("");
-            console.log("Key found directly:", key);
+            console.log("\n\nKey found directly:", key);
+
             const checkString = await getSources();
-            console.log("");
-            console.log("");
-            console.log("checkString found:", checkString);
+
+            console.log("\n\ncheckString found:", checkString);
+
             let decrypted, plaintext, parsed;
-            console.log("");
-            console.log("");
+
             try {
                 decrypted = CryptoJS.AES.decrypt(checkString, key);
                 plaintext = decrypted.toString(CryptoJS.enc.Utf8);
                 parsed = JSON.parse(plaintext);
-                console.log("Success with direct key:", key);                
+                console.log("\n\nSuccess with direct key:", key);                
             } catch (err) {
                 const reversedKey = key.split('').reverse().join('');
                 try {
@@ -105,9 +122,9 @@ async function main() {
                     plaintext = decrypted.toString(CryptoJS.enc.Utf8);
                     parsed = JSON.parse(plaintext);
                     key = reversedKey; 
-                    console.log("Success with reversed key:", key);
+                    console.log("\n\nSuccess with reversed key:", key);
                 } catch (err2) {
-                    console.log("Failed to decrypt with both direct and reversed key.");
+                    console.log("\n\nFailed to decrypt with both direct and reversed key.");
                 }
             }
         }
@@ -121,20 +138,18 @@ async function main() {
             let decoded = null;
             try {
                 const ascii = Buffer.from(possibleKey, 'base64').toString('ascii');
-                console.log("");
-                console.log("");
                 if (/^[\da-fA-F]{64}$/.test(ascii)) {
                     key = ascii;
-                    console.log("Key found as base64 (decoded as ASCII/hex):", key);
+                    console.log("\n\nKey found as base64 (decoded as ASCII/hex):", key);
                 } else {
                     const hex = Buffer.from(possibleKey, 'base64').toString('hex');
                     const asciiFromHex = Buffer.from(hex, 'hex').toString('ascii');                    
                     if (/^[\da-fA-F]{64}$/.test(asciiFromHex)) {
                         key = asciiFromHex;
-                        console.log("Key found as base64 (decoded as HEX→ASCII):", key);
+                        console.log("\n\nKey found as base64 (decoded as HEX→ASCII):", key);
                     } else if (hex.length === 128) {
                         key = hex;
-                        console.log("Key found as base64 and converted to 128-char hex:", key);
+                        console.log("\n\nKey found as base64 and converted to 128-char hex:", key);
                     }
                 }
             } catch (e) {
@@ -144,16 +159,14 @@ async function main() {
             const hexStrings = arrayMatch[0].match(/"([0-9a-fA-F]{2})"/g).map(s => s.replace(/"/g, ''));
             const asciiKey = hexStrings.map(h => String.fromCharCode(parseInt(h, 16))).join('');
             const hexKey = hexStrings.join('');
-            console.log("");
-            console.log("");
             if (/^[\x20-\x7E]{64}$/.test(asciiKey)) { 
                 key = asciiKey;
-                console.log("Key built from array of hex strings (as ASCII):", key);
+                console.log("\n\nKey built from array of hex strings (as ASCII):", key);
             } else if (hexKey.length === 128 && /^[0-9a-fA-F]+$/.test(hexKey)) {
                 key = hexKey;
-                console.log("Key built from array of hex strings (as HEX):", key);
+                console.log("\n\nKey built from array of hex strings (as HEX):", key);
             } else {
-                console.error("Array of hex strings found, but neither ASCII nor HEX version is valid.");
+                console.error("\n\nArray of hex strings found, but neither ASCII nor HEX version is valid.");
                 await sendErrorEmail("Array of hex strings found, but neither ASCII nor HEX version is valid.");
             }
         } else {
@@ -163,17 +176,14 @@ async function main() {
                 const asciiKey = decNumbers.map(n => String.fromCharCode(n)).join('');
                 const hexKey = decNumbers.map(n => n.toString(16).padStart(2, '0')).join('');
 
-                console.log("");
-                console.log("");
-
                 if (/^[\x20-\x7E]{64}$/.test(asciiKey)) {
                     key = asciiKey;
-                    console.log("Key built from array of decimal numbers (as ASCII):", key);
+                    console.log("\n\nKey built from array of decimal numbers (as ASCII):", key);
                 } else if (hexKey.length === 128 && /^[0-9a-fA-F]+$/.test(hexKey)) {
                     key = hexKey;                    
-                    console.log("Key built from array of decimal numbers (as HEX):", key);
+                    console.log("\n\nKey built from array of decimal numbers (as HEX):", key);
                 } else {
-                    console.error("Array of decimal numbers found, but neither ASCII nor HEX version is valid.");
+                    console.error("\n\nArray of decimal numbers found, but neither ASCII nor HEX version is valid.");
                     await sendErrorEmail("Array of decimal numbers found, but neither ASCII nor HEX version is valid.");
                 }
             } else {
@@ -198,9 +208,7 @@ async function main() {
 
                     key = aValues.map(n => rValues[n]).join('');
                     
-                    console.log("");
-                    console.log("");
-                    console.log("Key reconstructed (legacy method):", key);
+                    console.log("\n\nKey reconstructed (legacy method):", key);
                 }
             }            
         }
@@ -210,23 +218,14 @@ async function main() {
         const asciiKey = Buffer.from(key, "hex").toString("ascii");
         if (/^[0-9a-fA-F]{64}$/.test(asciiKey)) {
             key = asciiKey;
-            console.log("");
-            console.log("");
-            console.log("Converted 128-hex to 64-char key:", key);
+            console.log("\n\nConverted 128-hex to 64-char key:", key);
         }
     }
 
     const isValidKey = typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
 
     if (!isValidKey) {
-        console.log("");
-        console.log("");
-
-        console.error("The generated key is NOT valid. The file will not be saved.");
-
-        console.log("");
-        console.log("");
-
+        console.error("\n\nThe generated key is NOT valid. The file will not be saved.");
         try {
             const keyResponse = await fetch("https://raw.githubusercontent.com/yogesh-hacker/MegacloudKeys/main/keys.json?v=" + Date.now());
 
@@ -234,29 +233,16 @@ async function main() {
 
             const keyTemp = keyJson.mega;
 
-            console.log("External key:", keyTemp);
+            console.log("\n\nExternal key:", keyTemp);
         
             const checkString = await getSources();
-
-            console.log("");
-            console.log("");
         
-            let decrypted, plaintext;
-            try {
-                decrypted = CryptoJS.AES.decrypt(checkString, keyTemp);
-                plaintext = decrypted.toString(CryptoJS.enc.Utf8);
-                console.log("Success with external key:", keyTemp);
-                key = keyTemp;
-            } catch (err) {
-                const reversedKey = keyTemp.split('').reverse().join('');
-                try {
-                    decrypted = CryptoJS.AES.decrypt(checkString, reversedKey);
-                    plaintext = decrypted.toString(CryptoJS.enc.Utf8);
-                    key = reversedKey; 
-                    console.log("Success with reversed external key:", key);
-                } catch (err2) {
-                    console.log("Failed to decrypt with both direct and reversed external key.");
-                }
+            const result = tryDecryptWithKeyOrReverse(checkString, keyTemp);
+
+            if (result) {
+                key = result.keyUsed;
+            } else {
+                console.log('\n\nCould not decrypt with either the direct or reversed key.');
             }
         } catch (extErr) {            
             console.error("No fue posible probar con key externa:", extErr);
@@ -277,18 +263,14 @@ async function main() {
             const HOUR = 60 * 60 * 1000;
 
             if (now - lastRun < HOUR) {
-                console.log("");
-                console.log("");
-                console.log("AI backup was already run less than 1 hour ago. Skipping AI execution.");
+                console.log("\n\nAI backup was already run less than 1 hour ago. Skipping AI execution.");
                 process.exit(0); 
             }
 
             try {
                 execSync('node core/build-key-ai.js', { stdio: 'inherit' });
             } catch (err) {
-                console.log("");
-                console.log("");
-                console.error("AI BACKUP SCRIPT FAILED!", err);
+                console.error("\n\nAI BACKUP SCRIPT FAILED!", err);
                 process.exit(1);
             }
 
@@ -315,11 +297,7 @@ async function main() {
     }
 
     if (lastKey === key) {
-        console.log("");
-        console.log("");
-        console.log('The key has not changed, the file will not be updated.');
-        console.log("");
-        console.log("");
+        console.log('\n\nThe key has not changed, the file will not be updated.\n\n');
         process.exit(0);
     }
 
@@ -344,20 +322,11 @@ async function main() {
 
     fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
 
-    console.log("");
-    console.log("");
-    console.log('key.json file created successfully.');
+    console.log('\n\nkey.json file created successfully.');
 
-    console.log("");
-    console.log("");
-    console.log('Previous date:', previousModifiedAt);
+    console.log('\n\nPrevious date:', previousModifiedAt);
 
-    console.log("");
-    console.log("");
-    console.log('Time since last generation:', elapsedSeconds, 'seconds');
-
-    console.log("");
-    console.log("");
+    console.log('\n\nTime since last generation:', elapsedSeconds, 'seconds\n\n');
 
     await sendNewKeyEmail(
         key,
