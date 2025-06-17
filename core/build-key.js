@@ -7,7 +7,28 @@ import CryptoJS from 'crypto-js';
 
 async function main() {
     async function getSources() {
-        const resp = await fetch("https://megacloud.blog/embed-2/v2/e-1/getSources?id=f1vbMHksHd0k", {
+
+        const resource = await fetch('https://hianime.to/ajax/v2/episode/sources?id=437666');
+
+        // We check if the type is iframe
+        const resourceData = await resource.json();
+        if (resourceData.type !== 'iframe') {
+            console.error('[!] Resource type is not iframe:', resourceData);
+            exit(1);
+        }
+
+        // We Extract domain & ID from the link https://{domain}/embed-2/v2/e-1/{id}?k=1
+        const link = resourceData.link;
+        const resourceLinkMatch = link.match(/https:\/\/([^/]+)\/embed-2\/v2\/e-1\/([^?]+)/);
+        if (!resourceLinkMatch) 
+        {
+            console.error('[!] Failed to extract domain and ID from link:', resourceData);
+            exit(2);
+        }
+        
+        const id = resourceLinkMatch[2];
+
+        const resp = await fetch("https://megacloud.blog/embed-2/v2/e-1/getSources?id=" + id, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
                 Referer: "http://hianime.to",
@@ -226,7 +247,6 @@ async function main() {
                 plaintext = decrypted.toString(CryptoJS.enc.Utf8);
                 parsed = JSON.parse(plaintext);
                 console.log("Success with external key:", keyTemp);
-                // Si llega aquí, reemplaza tu key
                 key = keyTemp;
             } catch (err) {
                 const reversedKey = keyTemp.split('').reverse().join('');
@@ -234,7 +254,7 @@ async function main() {
                     decrypted = CryptoJS.AES.decrypt(checkString, reversedKey);
                     plaintext = decrypted.toString(CryptoJS.enc.Utf8);
                     parsed = JSON.parse(plaintext);
-                    key = reversedKey; // <-- Ahora key es la key invertida
+                    key = reversedKey; 
                     console.log("Success with reversed external key:", key);
                 } catch (err2) {
                     console.log("Failed to decrypt with both direct and reversed external key.");
