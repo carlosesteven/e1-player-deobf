@@ -42,7 +42,7 @@ try {
 
     console.log("");
     console.log("");
-    console.log("Pass 1 complete.");
+    console.log("Pass 1: complete.");
 
     // inline data
     console.log("");
@@ -62,7 +62,7 @@ try {
 
     console.log("");
     console.log("");
-    console.log("Pass 2 complete.")
+    console.log("Pass 2: complete.")
 
     // solve string array and state machine
     console.log("");
@@ -82,7 +82,7 @@ try {
 
     console.log("");
     console.log("");
-    console.log("Pass 3 complete.")
+    console.log("Pass 3: complete.")
 
     // solve string array and state machine
 
@@ -103,7 +103,7 @@ try {
 
     console.log("");
     console.log("");
-    console.log("Pass 4 complete.")
+    console.log("Pass 4: complete.")
 } catch (err) {
     console.error("\nAn error occurred during deobfuscation:", err);
 }
