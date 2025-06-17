@@ -222,11 +222,22 @@ async function main() {
 
     const isValidKey = typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
 
+
+    if (!isValidKey && typeof key === 'string' && key.length === 128 && /^[0-9a-fA-F]+$/.test(key)) {
+        // Convertir de 128-char hex (64 bytes) a ASCII
+        const asciiKey = Buffer.from(key, "hex").toString("ascii");
+        if (/^[0-9a-fA-F]{64}$/.test(asciiKey)) {
+            key = asciiKey;
+            console.log("");
+            console.log("Converted 128-hex to 64-char key:", key);
+        }
+    }
+
     if (!isValidKey) {
         console.error("The generated key is NOT valid. The file will not be saved.");
 
         process.exit(0);
-        
+
         await sendErrorEmail();
 
         let lastRun = 0;
