@@ -2,40 +2,89 @@ import fs from 'fs';
 import path from 'path';
 import { sendErrorEmail, sendNewKeyEmail } from './send-email.js';
 import { fileURLToPath } from 'url';
+import CryptoJS from 'crypto-js';
+
 
 async function main() {
+    async function getSources() {
+        const resp = await fetch("https://megacloud.blog/embed-2/v2/e-1/getSources?id=kzZeFJupBAvW", {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
+                Referer: "http://hianime.to",
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            method: 'GET',
+            mode: 'cors',
+        });
+    
+        if (!resp.ok) {
+            throw new Error(`Request failed: ${resp.status}`);
+        }
+    
+        const data = await resp.json();
+        if (data && data.sources) {
+            return data.sources; // <--- AQUÍ RETORNA EL STRING
+        } else {
+            throw new Error('No sources found!');
+        }
+    }
+
     const __filename = fileURLToPath(import.meta.url);
+
     const __dirname = path.dirname(__filename);
 
     const repoRoot = path.resolve(__dirname, '..'); 
 
     const outputDir = path.join(repoRoot, 'output');
 
-    // Read the deobfuscated JS file from output/output.js
     const code = fs.readFileSync(path.join(outputDir, 'output.js'), 'utf-8');
 
     const aiMarkerFile = path.join(outputDir, 'ai-last-run.json');
 
-    // This regex supports and extracts the decryption key regardless of leading or trailing dashes,
-    // handling all formats like: "key", "-key", "--key", "key-", "key--", "-key-", "--key--" (and all combinations).
     const keyMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]-*([0-9a-fA-F]{64})-*["'`]/);
 
     let key = null;
 
     if (keyMatch) {
         key = keyMatch[2];
-        const varName = keyMatch[1];
-        const reverseUsage = new RegExp(
-            `${varName}\.split\s*\(\s*['"]?['"]?\s*\)\s*\.reverse\s*\(\s*\)\s*\.join\s*\(\s*['"]?['"]?\s*\)`,
-            "m"
-        );
-        if (reverseUsage.test(code)) {
-            key = key.split('').reverse().join('');
-            console.log("Key found as reversed literal:", key);
-        } else {
-            console.log("Key found directly:", key);
+        let lastKeyTemp = null;
+        try {
+            if (fs.existsSync(keyFile)) {
+                const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
+                lastKeyTemp = previous.decryptKey;
+            }
+        } catch (err) {
+            lastKeyTemp = null;
         }
-    } else {
+        const reversedKey = key.split('').reverse().join('');
+        if (lastKeyTemp && (key === lastKeyTemp || reversedKey === lastKeyTemp)) {
+            key = lastKeyTemp;
+            console.log('The key has not changed (direct or reversed), skipping update.');            
+        }else{
+            console.log("Key found directly:", key);
+            const checkString = await getSources();
+            console.log("checkString found:", checkString);
+            let decrypted, plaintext, parsed;
+            try {
+                decrypted = CryptoJS.AES.decrypt(checkString, key);
+                plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+                parsed = JSON.parse(plaintext);
+                console.log("Success with direct key:", key);                
+            } catch (err) {
+                const reversedKey = key.split('').reverse().join('');
+                try {
+                    decrypted = CryptoJS.AES.decrypt(checkString, reversedKey);
+                    plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+                    parsed = JSON.parse(plaintext);
+                    key = reversedKey; // <-- ¡AQUÍ! ahora key tiene la buena
+                    console.log("Success with reversed key:", key);
+                } catch (err2) {
+                    console.log("Failed to decrypt with both direct and reversed key.");
+                    process.exit(1);
+                }
+            }
+        }
+    }else {
         // Try to find an array of 64 hex strings (e.g., O = ["30", ...])
         const arrayMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[((?:"[0-9a-fA-F]{2}",?\s*){64})\]/);
 
