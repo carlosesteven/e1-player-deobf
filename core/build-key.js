@@ -37,6 +37,8 @@ async function main() {
 
     const outputDir = path.join(repoRoot, 'output');
 
+    const keyFile = path.join(outputDir, 'key.json');
+
     const code = fs.readFileSync(path.join(outputDir, 'output.js'), 'utf-8');
 
     const aiMarkerFile = path.join(outputDir, 'ai-last-run.json');
@@ -59,7 +61,6 @@ async function main() {
         const reversedKey = key.split('').reverse().join('');
         if (lastKeyTemp && (key === lastKeyTemp || reversedKey === lastKeyTemp)) {
             key = lastKeyTemp;
-            console.log('The key has not changed (direct or reversed), skipping update.');            
         }else{
             console.log("Key found directly:", key);
             const checkString = await getSources();
@@ -226,9 +227,6 @@ async function main() {
 
         process.exit(0);
     }
-
-    // Set output key file location
-    const keyFile = path.join(outputDir, 'key.json');
 
     // Try reading the existing file to compare
     let lastKey = null;
