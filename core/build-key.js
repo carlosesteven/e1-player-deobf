@@ -217,8 +217,7 @@ async function main() {
             } else {
                 console.log("Decimal array found, but not matching ASCII/HEX key lengths.");
             }
-        }
-        process.exit(1);
+        }       
     }
 
     const isValidKey = typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
@@ -226,6 +225,8 @@ async function main() {
     if (!isValidKey) {
         console.error("The generated key is NOT valid. The file will not be saved.");
 
+        process.exit(0);
+        
         await sendErrorEmail();
 
         let lastRun = 0;
