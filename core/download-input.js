@@ -28,7 +28,11 @@ https.get(url, (res) => {
 
     fileStream.on('finish', () => {
         fileStream.close();
-        console.log('Download complete. Saved to', outputFile);
+        console.log("");
+        console.log("");
+        console.log('- Download complete. Saved to', outputFile);
+        console.log("");
+        console.log("");
     });
 }).on('error', (err) => {
     console.error('Request error:', err.message);

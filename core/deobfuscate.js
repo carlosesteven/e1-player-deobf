@@ -23,7 +23,11 @@ try {
     let intermediateCode;
     // normalize literals and unflatten cf
     const inputCode = fs.readFileSync(inputFile, 'utf-8');
+    
+    console.log("");
+    console.log("");
     console.log("--- Starting Pass 1: Normalizing Literals and Unflattening Control Flow ---");
+    
     const unflattenedResult = babel.transformSync(inputCode, {
         sourceType: "script",
         plugins: [normalizeLiterals, controlFlowUnflattener],
@@ -35,9 +39,14 @@ try {
     }
     intermediateCode = unflattenedResult.code;
     fs.writeFileSync(outputFile, intermediateCode, 'utf-8');
+
+    console.log("");
+    console.log("");
     console.log("Pass 1 complete.");
 
     // inline data
+    console.log("");
+    console.log("");
     console.log("--- Starting Pass 2: Inlining Arrays and Wrapper Funcs ---")
     const inlinedDataResult = babel.transformSync(intermediateCode, {
         sourceType: "script",
@@ -50,9 +59,14 @@ try {
     }
     intermediateCode = inlinedDataResult.code;
     fs.writeFileSync(outputFile, intermediateCode, 'utf-8');
+
+    console.log("");
+    console.log("");
     console.log("Pass 2 complete.")
 
     // solve string array and state machine
+    console.log("");
+    console.log("");
     console.log("--- Starting Pass 3: Solving String Array and Solving State Machine ---")
     const transformStringArray = babel.transformSync(intermediateCode, {
         sourceType: "script",
@@ -65,10 +79,15 @@ try {
     }
     intermediateCode = transformStringArray.code;
     fs.writeFileSync(outputFile, intermediateCode, 'utf-8');
+
+    console.log("");
+    console.log("");
     console.log("Pass 3 complete.")
 
-
     // solve string array and state machine
+
+    console.log("");
+    console.log("");
     console.log("--- Starting Pass 4: Inlining String Array ---")
     const inlineStringArr = babel.transformSync(intermediateCode, {
         sourceType: "script",
@@ -81,6 +100,9 @@ try {
     }
     intermediateCode = inlineStringArr.code;
     fs.writeFileSync(outputFile, intermediateCode, 'utf-8');
+
+    console.log("");
+    console.log("");
     console.log("Pass 4 complete.")
 } catch (err) {
     console.error("\nAn error occurred during deobfuscation:", err);
