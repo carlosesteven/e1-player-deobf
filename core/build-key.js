@@ -7,7 +7,7 @@ import CryptoJS from 'crypto-js';
 
 async function main() {
     async function getSources() {
-        const resp = await fetch("https://megacloud.blog/embed-2/v2/e-1/getSources?id=kzZeFJupBAvW", {
+        const resp = await fetch("https://megacloud.blog/embed-2/v2/e-1/getSources?id=f1vbMHksHd0k", {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
                 Referer: "http://hianime.to",
@@ -83,7 +83,7 @@ async function main() {
                     decrypted = CryptoJS.AES.decrypt(checkString, reversedKey);
                     plaintext = decrypted.toString(CryptoJS.enc.Utf8);
                     parsed = JSON.parse(plaintext);
-                    key = reversedKey; // <-- ¡AQUÍ! ahora key tiene la buena
+                    key = reversedKey; 
                     console.log("Success with reversed key:", key);
                 } catch (err2) {
                     console.log("Failed to decrypt with both direct and reversed key.");
@@ -198,40 +198,84 @@ async function main() {
     const isValidKey = typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
 
     if (!isValidKey) {
+        console.log("");
+        console.log("");
+
         console.error("The generated key is NOT valid. The file will not be saved.");
 
-        await sendErrorEmail();
-
-        let lastRun = 0;
-
-        if (fs.existsSync(aiMarkerFile)) {
-            try {
-                const info = JSON.parse(fs.readFileSync(aiMarkerFile, 'utf8'));
-                lastRun = new Date(info.lastRun).getTime();
-            } catch {}
-        }
-
-        const now = Date.now();
-
-        const HOUR = 30 * 60 * 1000;
-
-        if (now - lastRun < HOUR) {
-            console.log("");
-            console.log("");
-            console.log("AI backup was already run less than 1 hour ago. Skipping AI execution.");
-            process.exit(0); 
-        }
+        console.log("");
+        console.log("");
 
         try {
-            execSync('node core/build-key-ai.js', { stdio: 'inherit' });
-        } catch (err) {
-            console.log("");
-            console.log("");
-            console.error("AI BACKUP SCRIPT FAILED!", err);
-            process.exit(1);
-        }
+            const keyResponse = await fetch("https://raw.githubusercontent.com/yogesh-hacker/MegacloudKeys/main/keys.json?v=" + Date.now());
 
-        process.exit(0);
+            const keyJson = await keyResponse.json();
+
+            const keyTemp = keyJson.mega;
+
+            console.log("Intentando con key externa:", keyTemp);
+        
+            const checkString = await getSources();
+
+            console.log("");
+            console.log("");
+        
+            let decrypted, plaintext, parsed;
+            try {
+                decrypted = CryptoJS.AES.decrypt(checkString, keyTemp);
+                plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+                parsed = JSON.parse(plaintext);
+                console.log("Success with external key:", keyTemp);
+                // Si llega aquí, reemplaza tu key
+                key = keyTemp;
+            } catch (err) {
+                const reversedKey = keyTemp.split('').reverse().join('');
+                try {
+                    decrypted = CryptoJS.AES.decrypt(checkString, reversedKey);
+                    plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+                    parsed = JSON.parse(plaintext);
+                    key = reversedKey; // <-- Ahora key es la key invertida
+                    console.log("Success with reversed external key:", key);
+                } catch (err2) {
+                    console.log("Failed to decrypt with both direct and reversed external key.");
+                }
+            }
+        } catch (extErr) {            
+            console.error("No fue posible probar con key externa:", extErr);
+
+            await sendErrorEmail();
+
+            let lastRun = 0;
+
+            if (fs.existsSync(aiMarkerFile)) {
+                try {
+                    const info = JSON.parse(fs.readFileSync(aiMarkerFile, 'utf8'));
+                    lastRun = new Date(info.lastRun).getTime();
+                } catch {}
+            }
+
+            const now = Date.now();
+
+            const HOUR = 30 * 60 * 1000;
+
+            if (now - lastRun < HOUR) {
+                console.log("");
+                console.log("");
+                console.log("AI backup was already run less than 1 hour ago. Skipping AI execution.");
+                process.exit(0); 
+            }
+
+            try {
+                execSync('node core/build-key-ai.js', { stdio: 'inherit' });
+            } catch (err) {
+                console.log("");
+                console.log("");
+                console.error("AI BACKUP SCRIPT FAILED!", err);
+                process.exit(1);
+            }
+
+            process.exit(0);
+        }
     }
 
     let lastKey = null;
