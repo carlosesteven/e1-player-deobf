@@ -256,6 +256,8 @@ async function main() {
         console.log("");
         console.log("");
         console.log('The key has not changed, the file will not be updated.');
+        console.log("");
+        console.log("");
         process.exit(0);
     }
 
@@ -289,6 +291,9 @@ async function main() {
     console.log("");
     console.log("");
     console.log('Time since last generation:', elapsedSeconds, 'seconds');
+
+    console.log("");
+    console.log("");
 
     await sendNewKeyEmail(
         key,
