@@ -256,7 +256,7 @@ async function main() {
 
             const now = Date.now();
 
-            const HOUR = 30 * 60 * 1000;
+            const HOUR = 60 * 60 * 1000;
 
             if (now - lastRun < HOUR) {
                 console.log("");
