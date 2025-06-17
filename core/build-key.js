@@ -195,48 +195,10 @@ async function main() {
         }
     }
 
-    if (!key) {
-        // Busca arrays de números tipo [29, 31, 16, ...] de tamaño >= 64
-        const arrayMatch = code.match(/([A-Z_$][\w$]*)\s*=\s*\[((?:\d+,?\s*){64,})\]/);
-        if (arrayMatch) {
-            const nums = arrayMatch[0].match(/\d+/g).map(Number);
-            // Convertir cada número a char y unir
-            const ascii = nums.map(n => String.fromCharCode(n)).join('');
-            // También los puedes mostrar como hex
-            const hex = nums.map(n => n.toString(16).padStart(2, '0')).join('');
-            // Decide cuál es válida según el largo
-            if (/^[0-9a-fA-F]{64}$/.test(ascii)) {
-                key = ascii;
-                console.log("Key built from decimal array (ASCII):", key);
-            } else if (hex.length === 64) {
-                key = hex;
-                console.log("Key built from decimal array (HEX, 32 bytes):", key);
-            } else if (hex.length === 128) {
-                key = hex;
-                console.log("Key built from decimal array (HEX, 64 bytes):", key);
-            } else {
-                console.log("Decimal array found, but not matching ASCII/HEX key lengths.");
-            }
-        }       
-    }
-
     const isValidKey = typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
-
-
-    if (!isValidKey && typeof key === 'string' && key.length === 128 && /^[0-9a-fA-F]+$/.test(key)) {
-        // Convertir de 128-char hex (64 bytes) a ASCII
-        const asciiKey = Buffer.from(key, "hex").toString("ascii");
-        if (/^[0-9a-fA-F]{64}$/.test(asciiKey)) {
-            key = asciiKey;
-            console.log("");
-            console.log("Converted 128-hex to 64-char key:", key);
-        }
-    }
 
     if (!isValidKey) {
         console.error("The generated key is NOT valid. The file will not be saved.");
-
-        process.exit(0);
 
         await sendErrorEmail();
 
