@@ -4,7 +4,6 @@ import { sendErrorEmail, sendNewKeyEmail } from './send-email.js';
 import { fileURLToPath } from 'url';
 import CryptoJS from 'crypto-js';
 
-
 async function main() {
     async function getSources() {
         const resp = await fetch("https://megacloud.blog/embed-2/v2/e-1/getSources?id=kzZeFJupBAvW", {
@@ -23,7 +22,7 @@ async function main() {
     
         const data = await resp.json();
         if (data && data.sources) {
-            return data.sources; // <--- AQUÍ RETORNA EL STRING
+            return data.sources; 
         } else {
             throw new Error('No sources found!');
         }
@@ -86,31 +85,27 @@ async function main() {
             }
         }
     }else {
-        // Try to find an array of 64 hex strings (e.g., O = ["30", ...])
         const arrayMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[((?:"[0-9a-fA-F]{2}",?\s*){64})\]/);
 
-        // Regex para detectar un string base64
         const base64Match = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]([A-Za-z0-9+/=]{86,89})["'`]/);
 
         if (base64Match) {
             const possibleKey = base64Match[2];
             let decoded = null;
             try {
-                // 1. Intenta decodificar como ASCII (esperando una key printable)
                 const ascii = Buffer.from(possibleKey, 'base64').toString('ascii');
+                console.log("");
+                console.log("");
                 if (/^[\da-fA-F]{64}$/.test(ascii)) {
                     key = ascii;
                     console.log("Key found as base64 (decoded as ASCII/hex):", key);
                 } else {
-                    // 2. Si no, como hex (puede ser el "doble" pero eso no es válido)
                     const hex = Buffer.from(possibleKey, 'base64').toString('hex');
-                    // Prueba a decodificar ese hex a ascii de nuevo (rara vez pasa)
-                    const asciiFromHex = Buffer.from(hex, 'hex').toString('ascii');
+                    const asciiFromHex = Buffer.from(hex, 'hex').toString('ascii');                    
                     if (/^[\da-fA-F]{64}$/.test(asciiFromHex)) {
                         key = asciiFromHex;
                         console.log("Key found as base64 (decoded as HEX→ASCII):", key);
                     } else if (hex.length === 128) {
-                        // Último recurso: dejar hex de 128 pero no es lo estándar
                         key = hex;
                         console.log("Key found as base64 and converted to 128-char hex:", key);
                     }
@@ -120,19 +115,22 @@ async function main() {
             }
         }else if (arrayMatch) {
             const hexStrings = arrayMatch[0].match(/"([0-9a-fA-F]{2})"/g).map(s => s.replace(/"/g, ''));
-            // Opción 1: key como texto ASCII
             const asciiKey = hexStrings.map(h => String.fromCharCode(parseInt(h, 16))).join('');
-            // Opción 2: key como hex puro
             const hexKey = hexStrings.join('');
         
-            // ¿Cuál usar? Priorizamos ASCII si es printable y longitud 64, si no el hex
             if (/^[\x20-\x7E]{64}$/.test(asciiKey)) { // 64 caracteres ASCII imprimibles
                 key = asciiKey;
+                console.log("");
+                console.log("");
                 console.log("Key built from array of hex strings (as ASCII):", key);
             } else if (hexKey.length === 128 && /^[0-9a-fA-F]+$/.test(hexKey)) {
                 key = hexKey;
+                console.log("");
+                console.log("");
                 console.log("Key built from array of hex strings (as HEX):", key);
             } else {
+                console.log("");
+                console.log("");
                 console.error("Array of hex strings found, but neither ASCII nor HEX version is valid.");
                 await sendErrorEmail("Array of hex strings found, but neither ASCII nor HEX version is valid.");
                 process.exit(1);
@@ -144,11 +142,14 @@ async function main() {
                 const asciiKey = decNumbers.map(n => String.fromCharCode(n)).join('');
                 const hexKey = decNumbers.map(n => n.toString(16).padStart(2, '0')).join('');
 
+                console.log("");
+                console.log("");
+
                 if (/^[\x20-\x7E]{64}$/.test(asciiKey)) {
                     key = asciiKey;
                     console.log("Key built from array of decimal numbers (as ASCII):", key);
                 } else if (hexKey.length === 128 && /^[0-9a-fA-F]+$/.test(hexKey)) {
-                    key = hexKey;
+                    key = hexKey;                    
                     console.log("Key built from array of decimal numbers (as HEX):", key);
                 } else {
                     console.error("Array of decimal numbers found, but neither ASCII nor HEX version is valid.");
@@ -156,7 +157,6 @@ async function main() {
                     process.exit(1);
                 }
             } else {
-                // Otherwise, search for the arrays as before (legacy logic)
                 const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
                 let rArray = null, aArray = null;
 
@@ -179,21 +179,23 @@ async function main() {
 
                 key = aValues.map(n => rValues[n]).join('');
                 
+                console.log("");
+                console.log("");
                 console.log("Key reconstructed (legacy method):", key);
             }            
         }
     }
 
-    // Si la key es de 128 hex, intenta convertirla a ASCII y usa solo si es válida de 64 hex
     if (key && key.length === 128 && /^[0-9a-fA-F]{128}$/.test(key)) {
         const asciiKey = Buffer.from(key, "hex").toString("ascii");
         if (/^[0-9a-fA-F]{64}$/.test(asciiKey)) {
             key = asciiKey;
+            console.log("");
+            console.log("");
             console.log("Converted 128-hex to 64-char key:", key);
         }
     }
 
-    // Validate the key
     const isValidKey = key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
 
     if (!isValidKey) {
@@ -214,6 +216,8 @@ async function main() {
         const HOUR = 60 * 60 * 1000;
 
         if (now - lastRun < HOUR) {
+            console.log("");
+            console.log("");
             console.log("AI backup was already run less than 1 hour ago. Skipping AI execution.");
             process.exit(0); 
         }
@@ -221,6 +225,8 @@ async function main() {
         try {
             execSync('node core/build-key-ai.js', { stdio: 'inherit' });
         } catch (err) {
+            console.log("");
+            console.log("");
             console.error("AI BACKUP SCRIPT FAILED!", err);
             process.exit(1);
         }
@@ -228,7 +234,6 @@ async function main() {
         process.exit(0);
     }
 
-    // Try reading the existing file to compare
     let lastKey = null;
     let lastModifiedAt = null;
     let elapsedSeconds = null;
@@ -247,13 +252,13 @@ async function main() {
         previousModifiedAt = null;
     }
 
-    // If the key did NOT change, exit without saving
     if (lastKey === key) {
+        console.log("");
+        console.log("");
         console.log('The key has not changed, the file will not be updated.');
         process.exit(0);
     }
 
-    // Calculate elapsed time in seconds
     if (lastModifiedAt) {
         try {
             const lastDate = new Date(lastModifiedAt).getTime();
@@ -266,7 +271,6 @@ async function main() {
         }
     }
 
-    // Create the output JSON
     const result = {
         decryptKey: key,
         modifiedAt: new Date().toISOString(),
@@ -276,10 +280,14 @@ async function main() {
 
     fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
 
+    console.log("");
+    console.log("");
     console.log('key.json file created successfully.');
-
+    console.log("");
+    console.log("");
     console.log('Previous date:', previousModifiedAt);
-
+    console.log("");
+    console.log("");
     console.log('Time since last generation:', elapsedSeconds, 'seconds');
 
     await sendNewKeyEmail(

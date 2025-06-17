@@ -30,9 +30,7 @@ https.get(url, (res) => {
         fileStream.close();
         console.log("");
         console.log("");
-        console.log('- Download complete. Saved to', outputFile);
-        console.log("");
-        console.log("");
+        console.log('--- Download complete. Saved to', outputFile);
     });
 }).on('error', (err) => {
     console.error('Request error:', err.message);
