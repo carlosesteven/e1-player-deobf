@@ -62,6 +62,7 @@ async function main() {
     console.log("Reading output.js...");
 
     const data = await fs.promises.readFile(outputFile, "utf8");
+    
     const match = data.match(/\(\(\)\s*=>\s*\{([\s\S]*?)try\s*{/);
 
     if (!match) {
