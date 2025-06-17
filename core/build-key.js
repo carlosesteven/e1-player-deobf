@@ -285,9 +285,11 @@ async function main() {
     console.log("");
     console.log("");
     console.log('key.json file created successfully.');
+
     console.log("");
     console.log("");
     console.log('Previous date:', previousModifiedAt);
+    
     console.log("");
     console.log("");
     console.log('Time since last generation:', elapsedSeconds, 'seconds');
