@@ -32,23 +32,23 @@ export const solveStringArray = {
       },
       exit(programPath) {
         if (!largeStringInfo || !decoderInfo) {
-          console.error('[SOLVE-STR] Could not find both the large string and the decoder. Aborting.');
+          //console.error('[SOLVE-STR] Could not find both the large string and the decoder. Aborting.');
           programPath.stop();
           return;
         }
 
-        console.log('[SOLVE-STR] Both targets found. Starting deobfuscation...');
+        //console.log('[SOLVE-STR] Both targets found. Starting deobfuscation...');
 
         const { value: uriString } = largeStringInfo;
         const { xorKey, separator, statefulShuffleOps, path: decoderPath } = decoderInfo;
 
         if (statefulShuffleOps.length === 0) {
-            console.error('[SOLVE-STR] Failed to extract any shuffle operations. Aborting.');
+            //console.error('[SOLVE-STR] Failed to extract any shuffle operations. Aborting.');
             programPath.stop();
             return;
         }
         
-        console.log(`[SOLVE-STR] Successfully extracted ${statefulShuffleOps.length} shuffle operations.`);
+        //console.log(`[SOLVE-STR] Successfully extracted ${statefulShuffleOps.length} shuffle operations.`);
 
         const decodedString = decodeURIComponent(uriString);
 
@@ -61,7 +61,7 @@ export const solveStringArray = {
         
         processedArray = correctlyShuffle(processedArray, statefulShuffleOps);
 
-        console.log(`[SOLVE-STR] Decrypted array with ${processedArray.length} elements.`);
+        //console.log(`[SOLVE-STR] Decrypted array with ${processedArray.length} elements.`);
 
         const innerArrayNode = t.arrayExpression(
           processedArray.map(s => t.stringLiteral(s))
@@ -80,10 +80,10 @@ export const solveStringArray = {
         const newFunctionNode = t.functionExpression(null, [functionParam], functionBody);
         
         decoderPath.get('value').replaceWith(newFunctionNode);
-        console.log(`[SOLVE-STR] Replaced decoder IIFE with a new accessor function.`);
+        //console.log(`[SOLVE-STR] Replaced decoder IIFE with a new accessor function.`);
 
         largeStringInfo.path.remove();
-        console.log(`[SOLVE-STR] Removed large string function.`);
+        //console.log(`[SOLVE-STR] Removed large string function.`);
       },
     },
 
@@ -96,7 +96,7 @@ export const solveStringArray = {
       const returnArg = body[0].get('argument');
       if (!returnArg.isStringLiteral() || returnArg.node.value.length < 500) return;
 
-      console.log(`[SOLVE-STR] Found large string function: "${path.node.id.name}"`);
+      //console.log(`[SOLVE-STR] Found large string function: "${path.node.id.name}"`);
       largeStringInfo = {
         value: returnArg.node.value,
         path: path,
@@ -146,7 +146,7 @@ export const solveStringArray = {
       if (foundOps.length > 0) {
         const propKey = path.get('key');
         const propName = propKey.isIdentifier() ? propKey.node.name : propKey.isStringLiteral() ? propKey.node.value : '[computed]';
-        console.log(`[SOLVE-STR] Found decoder IIFE assigned to property: "${propName}"`);
+        //console.log(`[SOLVE-STR] Found decoder IIFE assigned to property: "${propName}"`);
         
         decoderInfo = {
           xorKey,
