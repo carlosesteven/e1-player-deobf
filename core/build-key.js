@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { sendErrorEmail, sendNewKeyEmail } from './send-email.js';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 import CryptoJS from 'crypto-js';
 
 async function main() {
@@ -168,23 +169,23 @@ async function main() {
 
                 if (!rArray || !aArray) {
                     console.error("Could not find the arrays or direct variable.");
-                    await sendErrorEmail("Could not find the arrays or direct variable.");
+                    await sendErrorEmail("Could not find the arrays or direct variable.");                    
+                }else{
+                    const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+
+                    const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+
+                    key = aValues.map(n => rValues[n]).join('');
+                    
+                    console.log("");
+                    console.log("");
+                    console.log("Key reconstructed (legacy method):", key);
                 }
-
-                const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
-
-                const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
-
-                key = aValues.map(n => rValues[n]).join('');
-                
-                console.log("");
-                console.log("");
-                console.log("Key reconstructed (legacy method):", key);
             }            
         }
     }
 
-    if (key && key.length === 128 && /^[0-9a-fA-F]{128}$/.test(key)) {
+    if (typeof key === 'string' && key.length === 128 && /^[0-9a-fA-F]{128}$/.test(key)) {
         const asciiKey = Buffer.from(key, "hex").toString("ascii");
         if (/^[0-9a-fA-F]{64}$/.test(asciiKey)) {
             key = asciiKey;
@@ -194,7 +195,7 @@ async function main() {
         }
     }
 
-    const isValidKey = key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
+    const isValidKey = typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
 
     if (!isValidKey) {
         console.error("The generated key is NOT valid. The file will not be saved.");

@@ -8,6 +8,12 @@ export async function sendErrorEmail(mensajeExtra = '') {
     const correo_destinatario = process.env.MAIL_TO.split(/[,;]/).map(e => e.trim()).filter(Boolean);
     const host_correo = process.env.MAIL_HOST;
     const hora = new Date().toLocaleString('en-US', { hour12: false, timeZone: 'America/Bogota' });
+    
+    const send_email = process.env.SEND_EMAIL;
+    if (!send_email || send_email.toLowerCase() === 'false' || send_email === '0') {
+        console.error("Not send email");
+        return;
+    }
 
     if (!correo_remitente || !password_remitente || !correo_destinatario.length || !host_correo) {
         console.error("Missing environment variables for sending email.");
@@ -46,6 +52,12 @@ export async function sendNewKeyEmail(newKey, mensajeExtra = '') {
     const correo_destinatario = process.env.MAIL_TO.split(/[,;]/).map(e => e.trim()).filter(Boolean);
     const host_correo = process.env.MAIL_HOST;
     const hora = new Date().toLocaleString('en-US', { hour12: false, timeZone: 'America/Bogota' });
+
+    const send_email = process.env.SEND_EMAIL;
+    if (!send_email || send_email.toLowerCase() === 'false' || send_email === '0') {
+        console.error("Not send email");
+        return;
+    }
 
     if (!correo_remitente || !password_remitente || !correo_destinatario.length || !host_correo) {
         console.error("Missing environment variables for sending email.");
