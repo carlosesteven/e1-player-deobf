@@ -213,7 +213,7 @@ async function main() {
 
             const keyTemp = keyJson.mega;
 
-            console.log("Intentando con key externa:", keyTemp);
+            console.log("External key:", keyTemp);
         
             const checkString = await getSources();
 
