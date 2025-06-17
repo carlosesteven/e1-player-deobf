@@ -241,11 +241,10 @@ async function main() {
             console.log("");
             console.log("");
         
-            let decrypted, plaintext, parsed;
+            let decrypted, plaintext;
             try {
                 decrypted = CryptoJS.AES.decrypt(checkString, keyTemp);
                 plaintext = decrypted.toString(CryptoJS.enc.Utf8);
-                parsed = JSON.parse(plaintext);
                 console.log("Success with external key:", keyTemp);
                 key = keyTemp;
             } catch (err) {
@@ -253,7 +252,6 @@ async function main() {
                 try {
                     decrypted = CryptoJS.AES.decrypt(checkString, reversedKey);
                     plaintext = decrypted.toString(CryptoJS.enc.Utf8);
-                    parsed = JSON.parse(plaintext);
                     key = reversedKey; 
                     console.log("Success with reversed external key:", key);
                 } catch (err2) {
