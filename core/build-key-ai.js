@@ -62,7 +62,7 @@ async function main() {
     console.log("Reading output.js...");
 
     const data = await fs.promises.readFile(outputFile, "utf8");
-    
+
     const match = data.match(/\(\(\)\s*=>\s*\{([\s\S]*?)try\s*{/);
 
     if (!match) {
@@ -149,6 +149,18 @@ async function main() {
     console.log('Key successfully written to key.json.');
 
     console.log('AI marker file updated:', aiMarkerFile);
+
+    await sendNewKeyEmail(
+        key,
+        [
+            `Previous key: ${lastKey || 'none'}`,
+            `Time since last: ${elapsedSeconds ?? 'unknown'} seconds.`,
+            `You can check the latest file here:`,
+            `https://raw.githubusercontent.com/carlosesteven/e1-player-deobf/main/output/key.json`,
+            `See full commit history:`,
+            `https://github.com/carlosesteven/e1-player-deobf/commits/main/output/key.json`
+        ].join('\n\n')
+    );
   } catch (error) {
     console.error("Error in main.", error);
   }

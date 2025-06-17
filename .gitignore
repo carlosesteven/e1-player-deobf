@@ -2,6 +2,7 @@ output/*.txt
 output/*.js
 
 package-lock.json
+output/ai-last-run.json
 
 # Logs
 logs
