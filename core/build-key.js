@@ -86,7 +86,6 @@ async function main() {
                     console.log("Success with reversed key:", key);
                 } catch (err2) {
                     console.log("Failed to decrypt with both direct and reversed key.");
-                    process.exit(1);
                 }
             }
         }
@@ -134,7 +133,6 @@ async function main() {
             } else {
                 console.error("Array of hex strings found, but neither ASCII nor HEX version is valid.");
                 await sendErrorEmail("Array of hex strings found, but neither ASCII nor HEX version is valid.");
-                process.exit(1);
             }
         } else {
             const decimalArrayMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[((?:\d+,?\s*){64})\]/);
@@ -155,7 +153,6 @@ async function main() {
                 } else {
                     console.error("Array of decimal numbers found, but neither ASCII nor HEX version is valid.");
                     await sendErrorEmail("Array of decimal numbers found, but neither ASCII nor HEX version is valid.");
-                    process.exit(1);
                 }
             } else {
                 const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
@@ -172,10 +169,10 @@ async function main() {
                 if (!rArray || !aArray) {
                     console.error("Could not find the arrays or direct variable.");
                     await sendErrorEmail("Could not find the arrays or direct variable.");
-                    process.exit(1);
                 }
 
                 const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
+
                 const aValues = JSON.parse(aArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
 
                 key = aValues.map(n => rValues[n]).join('');
@@ -205,6 +202,7 @@ async function main() {
         await sendErrorEmail();
 
         let lastRun = 0;
+
         if (fs.existsSync(aiMarkerFile)) {
             try {
                 const info = JSON.parse(fs.readFileSync(aiMarkerFile, 'utf8'));
