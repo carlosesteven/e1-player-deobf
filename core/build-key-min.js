@@ -3,8 +3,6 @@ import path from 'path';
 import { sendErrorEmail, sendNewKeyEmail } from './send-email.js';
 import { getSources, tryDecryptWithKeyOrReverse } from './utils.js';
 import { fileURLToPath } from 'url';
-import { execSync } from 'child_process';
-import CryptoJS from 'crypto-js';
 
 async function main() {
     const __filename = fileURLToPath(import.meta.url);
