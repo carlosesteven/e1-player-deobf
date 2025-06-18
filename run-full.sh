@@ -28,6 +28,6 @@ timeout --kill-after=5 "$TIMEOUT" bash -c '
     node core/build-key.js
 
     git add .
-    git commit -m "Update: $(date \"+%Y-%m-%d %H:%M:%S\")"
+    git commit -m "Update: $(date '\''+%Y-%m-%d %H:%M:%S'\'')"
     git push
 '
