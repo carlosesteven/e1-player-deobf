@@ -1,74 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import { sendErrorEmail, sendNewKeyEmail } from './send-email.js';
+import { getSources, tryDecryptWithKeyOrReverse } from './utils.js';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import CryptoJS from 'crypto-js';
 
 async function main() {
-    async function getSources() {
-
-        const resource = await fetch('https://hianime.to/ajax/v2/episode/sources?id=437666');
-
-        // We check if the type is iframe
-        const resourceData = await resource.json();
-        if (resourceData.type !== 'iframe') {
-            console.error('[!] Resource type is not iframe:', resourceData);
-            exit(1);
-        }
-
-        // We Extract domain & ID from the link https://{domain}/embed-2/v2/e-1/{id}?k=1
-        const link = resourceData.link;
-        const resourceLinkMatch = link.match(/https:\/\/([^/]+)\/embed-2\/v2\/e-1\/([^?]+)/);
-        if (!resourceLinkMatch) 
-        {
-            console.error('[!] Failed to extract domain and ID from link:', resourceData);
-            exit(2);
-        }
-        
-        const id = resourceLinkMatch[2];
-
-        const resp = await fetch("https://megacloud.blog/embed-2/v2/e-1/getSources?id=" + id, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
-                Referer: "http://hianime.to",
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            method: 'GET',
-            mode: 'cors',
-        });
-    
-        if (!resp.ok) {
-            throw new Error(`Request failed: ${resp.status}`);
-        }
-    
-        const data = await resp.json();
-        if (data && data.sources) {
-            return data.sources; 
-        } else {
-            throw new Error('No sources found!');
-        }
-    }
-
-    function tryDecryptWithKeyOrReverse(checkString, keyCandidate) {
-        let decrypted;
-        try {
-            decrypted = CryptoJS.AES.decrypt(checkString, keyCandidate);
-            console.log("\n\nSuccess with external key:", keyCandidate);
-            return { decrypted, keyUsed: keyCandidate, reversed: false };
-        } catch (err) {
-            const reversedKey = keyCandidate.split('').reverse().join('');
-            try {
-                decrypted = CryptoJS.AES.decrypt(checkString, reversedKey);
-                console.log("\n\nSuccess with reversed external key:", reversedKey);
-                return { decrypted, keyUsed: reversedKey, reversed: true };
-            } catch (err2) {
-                console.log("\n\nFailed to decrypt with either the direct or reversed key.");
-                return null;
-            }
-        }
-    }
-
     const __filename = fileURLToPath(import.meta.url);
 
     const __dirname = path.dirname(__filename);
@@ -224,6 +162,25 @@ async function main() {
 
     const isValidKey = typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]+$/.test(key);
 
+    let lastKey = null;
+    let lastModifiedAt = null;
+    let elapsedSeconds = null;
+    let previousModifiedAt = null;
+
+    try {
+        if (fs.existsSync(keyFile)) {
+            const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
+            lastKey = previous.decryptKey;
+            lastModifiedAt = previous.modifiedAt;
+            previousModifiedAt = previous.modifiedAt;
+        }
+    } catch (err) {
+        lastKey = null;
+        lastModifiedAt = null;
+        previousModifiedAt = null;
+    }
+
+
     if (!isValidKey) {
         console.error("\n\nThe generated key is NOT valid. The file will not be saved.");
         try {
@@ -234,6 +191,11 @@ async function main() {
             const keyTemp = keyJson.mega;
 
             console.log("\n\nExternal key:", keyTemp);
+
+            if (lastKey === keyTemp) {
+                console.log('\n\nThe key has not changed, the file will not be updated.\n\n');
+                process.exit(0);
+            }            
         
             const checkString = await getSources();
         
@@ -276,24 +238,6 @@ async function main() {
 
             process.exit(0);
         }
-    }
-
-    let lastKey = null;
-    let lastModifiedAt = null;
-    let elapsedSeconds = null;
-    let previousModifiedAt = null;
-
-    try {
-        if (fs.existsSync(keyFile)) {
-            const previous = JSON.parse(fs.readFileSync(keyFile, 'utf-8'));
-            lastKey = previous.decryptKey;
-            lastModifiedAt = previous.modifiedAt;
-            previousModifiedAt = previous.modifiedAt;
-        }
-    } catch (err) {
-        lastKey = null;
-        lastModifiedAt = null;
-        previousModifiedAt = null;
     }
 
     if (lastKey === key) {
