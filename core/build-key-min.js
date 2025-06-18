@@ -55,8 +55,6 @@ async function main() {
 
         if (result) {
             key = result.keyUsed;
-        } else {
-            console.log('\n\nCould not decrypt with either the direct or reversed key.');
         }
     } catch (extErr) {            
         console.error("No fue posible probar con key externa:", extErr);
@@ -83,32 +81,36 @@ async function main() {
         }
     }
 
-    const result = {
-        decryptKey: key,
-        modifiedAt: new Date().toISOString(),
-        previousModifiedAt,
-        elapsedSeconds
-    };
+    if (typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]+$/.test(key)) {
+        const result = {
+            decryptKey: key,
+            modifiedAt: new Date().toISOString(),
+            previousModifiedAt,
+            elapsedSeconds
+        };
 
-    fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
+        fs.writeFileSync(keyFile, JSON.stringify(result, null, 2), 'utf-8');
 
-    console.log('\n\nkey.json file created successfully.');
+        console.log('\n\nkey.json file created successfully.');
 
-    console.log('\n\nPrevious date:', previousModifiedAt);
+        console.log('\n\nPrevious date:', previousModifiedAt);
 
-    console.log('\n\nTime since last generation:', elapsedSeconds, 'seconds\n\n');
+        console.log('\n\nTime since last generation:', elapsedSeconds, 'seconds\n\n');
 
-    await sendNewKeyEmail(
-        key,
-        [
-            `Previous key: ${lastKey || 'none'}`,
-            `Time since last: ${elapsedSeconds ?? 'unknown'} seconds.`,
-            `You can check the latest file here:`,
-            `https://raw.githubusercontent.com/carlosesteven/e1-player-deobf/main/output/key.json`,
-            `See full commit history:`,
-            `https://github.com/carlosesteven/e1-player-deobf/commits/main/output/key.json`
-        ].join('\n\n')
-    );
+        await sendNewKeyEmail(
+            key,
+            [
+                `Previous key: ${lastKey || 'none'}`,
+                `Time since last: ${elapsedSeconds ?? 'unknown'} seconds.`,
+                `You can check the latest file here:`,
+                `https://raw.githubusercontent.com/carlosesteven/e1-player-deobf/main/output/key.json`,
+                `See full commit history:`,
+                `https://github.com/carlosesteven/e1-player-deobf/commits/main/output/key.json`
+            ].join('\n\n')
+        );
+    }else{
+        console.log('\n\nNo valid key to write. Nothing was updated.');
+    }
 }
 
 main();
