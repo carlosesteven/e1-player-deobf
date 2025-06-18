@@ -15,12 +15,6 @@ async function main() {
 
     const keyFile = path.join(outputDir, 'key.json');
 
-    const code = fs.readFileSync(path.join(outputDir, 'output.js'), 'utf-8');
-
-    const aiMarkerFile = path.join(outputDir, 'ai-last-run.json');
-
-    const keyMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*["'`]-*([0-9a-fA-F]{64})-*["'`]/);
-
     let key = null;
 
     let lastKey = null;
