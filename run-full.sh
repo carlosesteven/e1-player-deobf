@@ -1,26 +1,33 @@
 #!/bin/bash
 
-set -e  # Stop the script if any command fails
+LOCKFILE="/tmp/run-full.lock"
+TIMEOUT=45 # Max execution time in seconds
 
-# Set location
-cd "$(dirname "$0")"
+# Exit if already running
+if [ -f "$LOCKFILE" ]; then
+    echo "[ABORTED] run-full.sh is already running (lockfile exists)."
+    exit 1
+fi
 
-# Pull latest changes from the repository
-git pull
+# Create lockfile
+touch "$LOCKFILE"
 
-# Install updated dependencies
-npm install
+# Ensure lockfile is removed on exit (success or failure)
+trap 'rm -f "$LOCKFILE"' EXIT
 
-# Run the Node.js sequence
-node core/download-input.js
-node core/deobfuscate.js
-node core/build-key.js
+# Run the original sequence with a timeout
+timeout --kill-after=5 "$TIMEOUT" bash -c '
+    set -e
+    cd "$(dirname "$0")"
 
-# Add all changes to git
-git add .
+    git pull
+    npm install
 
-# Commit with current date and time
-git commit -m "Update: $(date '+%Y-%m-%d %H:%M:%S')"
+    node core/download-input.js
+    node core/deobfuscate.js
+    node core/build-key.js
 
-# Push the changes
-git push
+    git add .
+    git commit -m "Update: $(date \"+%Y-%m-%d %H:%M:%S\")"
+    git push
+'
