@@ -43,7 +43,7 @@ async function main() {
 
         const keyJson = await keyResponse.json();
 
-        const keyTemp = keyJson.mega + "b";
+        const keyTemp = keyJson.mega;
 
         console.log("\n\nExternal key:", keyTemp);
 
@@ -130,6 +130,8 @@ async function main() {
         if (now - lastRun < HOUR) {
             console.log("\n\nAI backup was already run less than 1 hour ago. Skipping AI execution.");
             process.exit(0); 
+        }else{
+            fs.writeFileSync(aiMarkerFile, JSON.stringify({ lastRun: new Date().toISOString() }), 'utf-8');
         }
 
         try {
