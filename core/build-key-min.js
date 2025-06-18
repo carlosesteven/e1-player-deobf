@@ -3,6 +3,7 @@ import path from 'path';
 import { sendErrorEmail, sendNewKeyEmail } from './send-email.js';
 import { getSources, tryDecryptWithKeyOrReverse } from './utils.js';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 async function main() {
     const __filename = fileURLToPath(import.meta.url);
@@ -14,6 +15,8 @@ async function main() {
     const outputDir = path.join(repoRoot, 'output');
 
     const keyFile = path.join(outputDir, 'key.json');
+
+    const aiMarkerFile = path.join(outputDir, 'ai-last-run.json');
 
     let key = null;
 
@@ -40,7 +43,7 @@ async function main() {
 
         const keyJson = await keyResponse.json();
 
-        const keyTemp = keyJson.mega;
+        const keyTemp = keyJson.mega + "b";
 
         console.log("\n\nExternal key:", keyTemp);
 
@@ -110,6 +113,31 @@ async function main() {
         );
     }else{
         console.log('\n\nNo valid key to write. Nothing was updated.');
+
+        let lastRun = 0;
+        
+        if (fs.existsSync(aiMarkerFile)) {
+            try {
+                const info = JSON.parse(fs.readFileSync(aiMarkerFile, 'utf8'));
+                lastRun = new Date(info.lastRun).getTime();
+            } catch {}
+        }
+
+        const now = Date.now();
+
+        const HOUR = 5 * 60 * 1000;
+
+        if (now - lastRun < HOUR) {
+            console.log("\n\nAI backup was already run less than 1 hour ago. Skipping AI execution.");
+            process.exit(0); 
+        }
+
+        try {
+            execSync('node core/build-key-ai.js', { stdio: 'inherit' });
+        } catch (err) {
+            console.error("\n\nAI BACKUP SCRIPT FAILED!", err);
+            process.exit(1);
+        }
     }
 }
 
