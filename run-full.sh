@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGFILE="/home/csc-lab/el-player-deobf/full.log"
+LOGFILE="/home/csc-lab/e1-player-deobf/full.log"
 LOCKFILE="/tmp/run-full.lock"
 TIMEOUT=45 # Max execution time in seconds
 

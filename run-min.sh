@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGFILE="/home/csc-lab/el-player-deobf/min.log"
+LOGFILE="/home/csc-lab/e1-player-deobf/min.log"
 LOCKFILE="/tmp/run-min.lock"
 TIMEOUT=45 # Max execution time in seconds
 
