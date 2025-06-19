@@ -33,8 +33,7 @@ TIMEOUT=45 # Max execution time in seconds
         node core/build-key.js
 
         git add .
-        MSG="Update: $(date '+%Y-%m-%d %H:%M:%S')"
-        git commit -m "$MSG" || echo "[INFO] No changes to commit."
+        git commit -m "Update: $(date '+%Y-%m-%d %H:%M:%S')" || echo "[INFO] No changes to commit."
         git push
     '
 
