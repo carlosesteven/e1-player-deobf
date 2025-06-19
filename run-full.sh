@@ -20,7 +20,8 @@ TIMEOUT=45 # Max execution time in seconds
     # Ensure lockfile is removed on exit (success or failure)
     trap 'rm -f "$LOCKFILE"' EXIT
 
-    # Run the original sequence with a timeout
+    MSG="Update: $(date '+%Y-%m-%d %H:%M:%S')"
+
     timeout --kill-after=5 "$TIMEOUT" bash -c '
         set -e
         cd "$(dirname "$0")"
@@ -33,9 +34,9 @@ TIMEOUT=45 # Max execution time in seconds
         node core/build-key.js
 
         git add .
-        git commit -m "Update: $(date '+%Y-%m-%d %H:%M:%S')" || echo "[INFO] No changes to commit."
+        git commit -m "$1" || echo "[INFO] No changes to commit."
         git push
-    '
+    ' bash "$MSG"
 
     echo "[END] $(date) - run-full.sh"
     echo "-----"
