@@ -20,12 +20,19 @@ TIMEOUT=45 # Max execution time in seconds
     # Ensure lockfile is removed on exit (success or failure)
     trap 'rm -f "$LOCKFILE"' EXIT
 
-    # Run the original script with timeout
+    MSG="Update (run-min): $(date '+%Y-%m-%d %H:%M:%S')"
+
+    # Run the original script with timeout and git commit
     timeout --kill-after=5 "$TIMEOUT" bash -c '
         set -e
         cd "$(dirname "$0")"
+
         node core/build-key-min.js
-    '
+
+        git add .
+        git commit -m "$1" || echo "[INFO] No changes to commit."
+        git push
+    ' bash "$MSG"
 
     echo "[END] $(date) - run-min.sh"
     echo "-----"
