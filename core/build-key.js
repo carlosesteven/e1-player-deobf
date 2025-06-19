@@ -137,7 +137,7 @@ async function main() {
                 }
 
                 if (!rArray || !aArray) {
-                    console.error("Could not find the arrays or direct variable.");
+                    console.error("\n\nCould not find the arrays or direct variable.");
                     //await sendErrorEmail("Could not find the arrays or direct variable.");                    
                 }else{
                     const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
