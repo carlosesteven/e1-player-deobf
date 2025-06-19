@@ -105,7 +105,7 @@ async function main() {
                 console.log("\n\nKey built from array of hex strings (as HEX):", key);
             } else {
                 console.error("\n\nArray of hex strings found, but neither ASCII nor HEX version is valid.");
-                await sendErrorEmail("Array of hex strings found, but neither ASCII nor HEX version is valid.");
+                //await sendErrorEmail("Array of hex strings found, but neither ASCII nor HEX version is valid.");
             }
         } else {
             const decimalArrayMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[((?:\d+,?\s*){64})\]/);
@@ -122,7 +122,7 @@ async function main() {
                     console.log("\n\nKey built from array of decimal numbers (as HEX):", key);
                 } else {
                     console.error("\n\nArray of decimal numbers found, but neither ASCII nor HEX version is valid.");
-                    await sendErrorEmail("Array of decimal numbers found, but neither ASCII nor HEX version is valid.");
+                    //await sendErrorEmail("Array of decimal numbers found, but neither ASCII nor HEX version is valid.");
                 }
             } else {
                 const rMatch = code.match(/([a-zA-Z_$][\w$]*)\s*=\s*\[([^\]]+)\];/g);
@@ -138,7 +138,7 @@ async function main() {
 
                 if (!rArray || !aArray) {
                     console.error("Could not find the arrays or direct variable.");
-                    await sendErrorEmail("Could not find the arrays or direct variable.");                    
+                    //await sendErrorEmail("Could not find the arrays or direct variable.");                    
                 }else{
                     const rValues = JSON.parse(rArray.replace(/^[^\[]*\[/, '[').replace(/;$/, ''));
 
@@ -209,7 +209,7 @@ async function main() {
         } catch (extErr) {            
             console.error("No fue posible probar con key externa:", extErr);
 
-            await sendErrorEmail();
+            await sendErrorEmail("Could not find the arrays or direct variable.");             
 
             let lastRun = 0;
 
