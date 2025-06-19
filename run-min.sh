@@ -1,23 +1,32 @@
 #!/bin/bash
 
+LOGFILE="/home/csc-lab/el-player-deobf/min.log"
 LOCKFILE="/tmp/run-min.lock"
 TIMEOUT=45 # Max execution time in seconds
 
-# Exit if already running
-if [ -f "$LOCKFILE" ]; then
-    echo "[ABORTED] run-min.sh is already running (lockfile exists)."
-    exit 1
-fi
+{
+    echo "-----"
+    echo "[START] $(date) - run-min.sh"
 
-# Create lockfile
-touch "$LOCKFILE"
+    # Exit if already running
+    if [ -f "$LOCKFILE" ]; then
+        echo "[ABORTED] run-min.sh is already running (lockfile exists)."
+        exit 1
+    fi
 
-# Ensure lockfile is removed on exit (success or failure)
-trap 'rm -f "$LOCKFILE"' EXIT
+    # Create lockfile
+    touch "$LOCKFILE"
 
-# Run the original script with timeout
-timeout --kill-after=5 "$TIMEOUT" bash -c '
-    set -e
-    cd "$(dirname "$0")"
-    node core/build-key-min.js
-'
+    # Ensure lockfile is removed on exit (success or failure)
+    trap 'rm -f "$LOCKFILE"' EXIT
+
+    # Run the original script with timeout
+    timeout --kill-after=5 "$TIMEOUT" bash -c '
+        set -e
+        cd "$(dirname "$0")"
+        node core/build-key-min.js
+    '
+
+    echo "[END] $(date) - run-min.sh"
+    echo "-----"
+} >> "$LOGFILE" 2>&1
