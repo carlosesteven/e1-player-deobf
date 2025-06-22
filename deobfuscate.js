@@ -57,7 +57,7 @@ try {
     console.log("Pass 3 complete.")
 
 
-    // solve string array and state machine
+    // inline string array
     console.log("--- Starting Pass 4: Inlining String Array ---")
     const inlineStringArr = babel.transformSync(intermediateCode, {
         sourceType: "script",
