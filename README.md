@@ -1,26 +1,36 @@
-# E1 Player Deobfuscator
+# ⚠️ Notice
+I was unaware when I first deobfuscated this that it wasnt tailored obfuscation, it is instead [JScrambler](https://jscrambler.com/) a paid obfuscator...
 
-This project undoes most of the key transformations done to obfuscate the e1-player used on sites like flixhq & hianime.
+Now that I am aware of this, I have modified the obfuscator to be a bit faster, more resistent and moved the logic to a more fitting repo:
+- https://github.com/Ciarands/jscrambler-deobfuscator
 
-It wasnt particularly difficult to reverse although neither was the last WASM based implementation, please provide a better challenge in future :3
+This repo will be archived, please use the above deobfuscator for this task.
+
+--- 
+
+# ~~E1 Player Deobfuscator~~
+
+~~This project undoes most of the key transformations done to obfuscate the e1-player used on sites like flixhq & hianime.~~
+
+~~It wasnt particularly difficult to reverse although neither was the last WASM based implementation, please provide a better challenge in future :3~~
 
 ---
 
-### (1) The getSources request will return an AES CBC ciphertext
+### ~~(1) The getSources request will return an AES CBC ciphertext~~
 
-`/embed-1/v2/e-1/getSources?id=<XRAX>`
+~~`/embed-1/v2/e-1/getSources?id=<XRAX>`~~
 
-### (2) Then to decrypt it we just locate the ciphertext array and their indexes
-![alt text](./images/aes-key-arrays.png)
+### ~~(2) Then to decrypt it we just locate the ciphertext array and their indexes~~
+~~![alt text](./images/aes-key-arrays.png)~~
 
-### (3) Combine them based on those aformentioned indexes e.g.
+### ~~(3) Combine them based on those aformentioned indexes e.g.~~
 ```js
 const r = ["81", "47", "aa6", "1b6", "dda3", "c", "a8", "c29", "90", "326e", "de89", "a", "2e8", "a", "7e50", "fb9", "1f", "1c60", "7", "2", "8", "1", "cd", "7", "c", "09", "9540", "c9"];
 const a = [9, 0, 7, 1, 8, 20, 25, 4, 11, 18, 2, 26, 15, 5, 18, 17, 27, 21, 3, 22, 14, 12, 10, 5, 16, 19, 11, 6];
 a.map(n=>r[n]).join("");
 ```
 
-### (4) If the key is 64 chars its probably a valid AES key 🎉
+### ~~(4) If the key is 64 chars its probably a valid AES key 🎉~~
 
 ---
 
