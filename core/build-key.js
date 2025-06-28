@@ -222,10 +222,10 @@ async function main() {
 
             const now = Date.now();
 
-            const HOUR = 60 * 60 * 1000;
+            const HALF_HOUR = 30 * 60 * 1000;
 
-            if (now - lastRun < HOUR) {
-                console.log("\n\nAI backup was already run less than 1 hour ago. Skipping AI execution.");
+            if (now - lastRun < HALF_HOUR) {
+                console.log("\n\nAI backup was already run less than 30 minutes ago. Skipping AI execution.");
                 process.exit(0); 
             }
 
