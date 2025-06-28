@@ -40,12 +40,15 @@ async function main() {
     
     try {
         const keyResponse = await fetch("https://raw.githubusercontent.com/yogesh-hacker/MegacloudKeys/main/keys.json?v=" + Date.now());
+
         const keyJson = await keyResponse.json();
+
         const keyTemp = keyJson.mega;
     
         console.log("\n\nExternal key:", keyTemp);
     
         const checkString = await getSources();
+
         let result = tryDecryptWithKeyOrReverse(checkString, keyTemp);
     
         if (result) {
@@ -61,7 +64,9 @@ async function main() {
     
             try {
                 const altKeyResponse = await fetch("https://raw.githubusercontent.com/itzzzme/megacloud-keys/main/key.txt?v=" + Date.now());
+
                 const altKeyText = await altKeyResponse.text();
+                
                 const altKey = altKeyText.trim();
     
                 console.log("\n\nTrying alternative key:", altKey);
