@@ -27,6 +27,9 @@ TIMEOUT=45 # Max execution time in seconds
         set -e
         cd "$(dirname "$0")"
 
+        git pull
+        npm install
+
         node core/build-key-min.js
 
         git add .
