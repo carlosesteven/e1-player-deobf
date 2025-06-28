@@ -20,7 +20,7 @@ TIMEOUT=45 # Max execution time in seconds
     # Ensure lockfile is removed on exit (success or failure)
     trap 'rm -f "$LOCKFILE"' EXIT
 
-    MSG="Update (run-full): $(date '+%Y-%m-%d %H:%M:%S')"
+    MSG="Update (full): $(date '+%Y-%m-%d %H:%M:%S')"
 
     timeout --kill-after=5 "$TIMEOUT" bash -c '
         set -e

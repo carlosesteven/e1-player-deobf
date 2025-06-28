@@ -20,7 +20,7 @@ TIMEOUT=45 # Max execution time in seconds
     # Ensure lockfile is removed on exit (success or failure)
     trap 'rm -f "$LOCKFILE"' EXIT
 
-    MSG="Update (run-min): $(date '+%Y-%m-%d %H:%M:%S')"
+    MSG="Update (min): $(date '+%Y-%m-%d %H:%M:%S')"
 
     # Run the original script with timeout and git commit
     timeout --kill-after=5 "$TIMEOUT" bash -c '
