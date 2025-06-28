@@ -40,52 +40,51 @@ async function main() {
     
     try {
         const keyResponse = await fetch("https://raw.githubusercontent.com/yogesh-hacker/MegacloudKeys/main/keys.json?v=" + Date.now());
-
         const keyJson = await keyResponse.json();
-
         const keyTemp = keyJson.mega;
-
+    
         console.log("\n\nExternal key:", keyTemp);
-
-        if (lastKey === keyTemp) {
-            console.log('\n\nThe key has not changed, the file will not be updated.\n\n');
-            process.exit(0);
-        }            
     
         const checkString = await getSources();
+        let result = tryDecryptWithKeyOrReverse(checkString, keyTemp);
     
-        const result = tryDecryptWithKeyOrReverse(checkString, keyTemp);
-
         if (result) {
             key = result.keyUsed;
-        }else {
+            if (lastKey === keyTemp) {
+                console.log('\n\nThe key has not changed, but it is still valid. No update needed.\n\n');
+                process.exit(0);
+            }
+        } else {
+            if (lastKey === keyTemp) {
+                console.log('\n\nThe key has not changed, but it is NO LONGER valid. Attempting fallback.\n\n');
+            }
+    
             try {
                 const altKeyResponse = await fetch("https://raw.githubusercontent.com/itzzzme/megacloud-keys/main/key.txt?v=" + Date.now());
-
                 const altKeyText = await altKeyResponse.text();
-
                 const altKey = altKeyText.trim();
     
                 console.log("\n\nTrying alternative key:", altKey);
     
                 let altResult = tryDecryptWithKeyOrReverse(checkString, altKey);
-
+    
                 if (altResult) {
                     key = altResult.keyUsed;
                 } else {
                     console.log('\n\nNo valid key found in either source.');
+                    process.exit(0);
                 }
-            } catch (altErr) {
-                console.error("\n\nFailed to fetch or test alternative key:", altErr);
+            } catch (altErr) {            
+                console.error("Could not test with external key:", altErr);
+                await sendErrorEmail();
+                process.exit(0);
             }
         }
     } catch (extErr) {            
-        console.error("No fue posible probar con key externa:", extErr);
-
+        console.error("Could not test with external key:", extErr);
         await sendErrorEmail();
-
         process.exit(0);
-    }    
+    }
 
     if (lastKey === key) {
         console.log('\n\nThe key has not changed, the file will not be updated.\n\n');
