@@ -58,6 +58,26 @@ async function main() {
 
         if (result) {
             key = result.keyUsed;
+        }else {
+            try {
+                const altKeyResponse = await fetch("https://raw.githubusercontent.com/itzzzme/megacloud-keys/main/key.txt?v=" + Date.now());
+
+                const altKeyText = await altKeyResponse.text();
+
+                const altKey = altKeyText.trim();
+    
+                console.log("\n\nTrying alternative key:", altKey);
+    
+                let altResult = tryDecryptWithKeyOrReverse(checkString, altKey);
+
+                if (altResult) {
+                    key = altResult.keyUsed;
+                } else {
+                    console.log('\n\nNo valid key found in either source.');
+                }
+            } catch (altErr) {
+                console.error("\n\nFailed to fetch or test alternative key:", altErr);
+            }
         }
     } catch (extErr) {            
         console.error("No fue posible probar con key externa:", extErr);
