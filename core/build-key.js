@@ -240,6 +240,13 @@ async function main() {
         }
     }
 
+    const FINAL_VALID_KEY = typeof key === 'string' && key.length === 64 && /^[0-9a-fA-F]{64}$/.test(key);
+
+    if (!FINAL_VALID_KEY) {
+        console.error("\n\nThe final key is NOT valid, will NOT be saved or emailed!\n\nKey value:", key);
+        process.exit(1);
+    }
+
     if (lastKey === key) {
         console.log('\n\nThe key has not changed, the file will not be updated.\n\n');
         process.exit(0);
