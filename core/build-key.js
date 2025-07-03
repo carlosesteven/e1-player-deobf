@@ -204,10 +204,29 @@ async function main() {
             if (result) {
                 key = result.keyUsed;
             } else {
-                console.log('\n\nCould not decrypt with either the direct or reversed key.');
+                const altKeyResponse = await fetch("https://raw.githubusercontent.com/itzzzme/megacloud-keys/main/key.txt?v=" + Date.now());
+
+                const altKeyText = await altKeyResponse.text();
+
+                const altKey = altKeyText.trim();
+
+                console.log("\n\nTrying with backup external key:", altKey);
+
+                if (lastKey === altKey) {
+                    console.log('\n\nThe key has not changed, the file will not be updated.\n\n');
+                    process.exit(0);
+                }            
+                        
+                const result = tryDecryptWithKeyOrReverse(checkString, altKey);
+
+                if (result) {
+                    key = result.keyUsed;
+                } else {
+                    console.log('\n\nCould not decrypt with either the direct or reversed key.');
+                }
             }
         } catch (extErr) {            
-            console.error("No fue posible probar con key externa:", extErr);
+            console.error("Could not try with external key:", extErr);
 
             await sendErrorEmail("Could not find the arrays or direct variable.");             
 
