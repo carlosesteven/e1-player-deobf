@@ -84,7 +84,7 @@ try {
     console.log("");
     console.log("Pass 3: complete.")
 
-    // solve string array and state machine
+    // inline string array
 
     console.log("");
     console.log("");
