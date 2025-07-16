@@ -23,7 +23,7 @@ export async function getSources() {
     const version = resourceLinkMatch[2]; // 'v2' o 'v3'
     const id = resourceLinkMatch[3];
 
-    const resp = await fetch("https://"+domain+"/embed-2/" + version + "/e-1/getSources?id=" + id, {
+    const resp = await fetch("https://" + domain + "/embed-2/" + version + "/e-1/getSources?id=" + id, { 
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
             Referer: "http://hianime.to",
