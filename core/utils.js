@@ -20,7 +20,9 @@ export async function getSources() {
     }
     
     const domain = resourceLinkMatch[1];
+    
     const version = resourceLinkMatch[2]; // 'v2' o 'v3'
+
     const id = resourceLinkMatch[3];
 
     const resp = await fetch("https://" + domain + "/embed-2/" + version + "/e-1/getSources?id=" + id, { 
