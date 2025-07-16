@@ -12,16 +12,18 @@ export async function getSources() {
 
     // We Extract domain & ID from the link https://{domain}/embed-2/v2/e-1/{id}?k=1
     const link = resourceData.link;
-    const resourceLinkMatch = link.match(/https:\/\/([^/]+)\/embed-2\/v2\/e-1\/([^?]+)/);
+    const resourceLinkMatch = link.match(/https:\/\/([^/]+)\/embed-2\/(v2|v3)\/e-1\/([^?]+)/);
     if (!resourceLinkMatch) 
     {
         console.error('[!] Failed to extract domain and ID from link:', resourceData);
         process.exit(1);
     }
     
-    const id = resourceLinkMatch[2];
+    const domain = resourceLinkMatch[1];
+    const version = resourceLinkMatch[2]; // 'v2' o 'v3'
+    const id = resourceLinkMatch[3];
 
-    const resp = await fetch("https://megacloud.blog/embed-2/v2/e-1/getSources?id=" + id, {
+    const resp = await fetch("https://"+domain+"/embed-2/" + version + "/e-1/getSources?id=" + id, {
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
             Referer: "http://hianime.to",
