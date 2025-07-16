@@ -12,7 +12,9 @@ export async function getSources() {
 
     // We Extract domain & ID from the link https://{domain}/embed-2/v2/e-1/{id}?k=1
     const link = resourceData.link;
-    const resourceLinkMatch = link.match(/https:\/\/([^/]+)\/embed-2\/(v2|v3)\/e-1\/([^?]+)/);
+
+    const resourceLinkMatch = link.match(/https:\/\/([^/]+)\/embed-2\/(v\d+)\/e-1\/([^?]+)/);
+    
     if (!resourceLinkMatch) 
     {
         console.error('[!] Failed to extract domain and ID from link:', resourceData);
